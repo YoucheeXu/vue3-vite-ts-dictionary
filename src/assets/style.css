@@ -1,0 +1,20 @@
+/* src/assets/style.css - 全局样式 */
+/* 清除 html/body 默认边距，设置 100% 宽高 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    overflow: auto;   /* hidden */
+}
+
+/* Vue 根容器（#app）铺满整个视口 */
+#app {
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    /* 可选：让 app 水平居中（视觉更友好） */
+    padding: 0;
+    box-sizing: border-box;
+}
