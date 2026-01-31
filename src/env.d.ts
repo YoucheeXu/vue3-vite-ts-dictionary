@@ -11,8 +11,16 @@ declare interface Window {
     handlePythonMessage: (message: string) => void;
     pywebview: {
         api: {
-            hello: (name: string) => Promise<string>;
-            // 后续添加更多 Python API 方法
+            invoke: (
+                idmsg: string,
+                ...args: any[]
+            ) => Promise<{
+                code: number;
+                msg?: string;
+                data?: any;
+                params?: Record<string, any>;
+            }>;
         };
     };
+    handlePythonCommand: (command: string, params: Record<string, any>) => void;
 }
