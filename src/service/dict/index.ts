@@ -2,9 +2,9 @@ import NetRquest from "../index";
 // import axios from "axios";
 
 interface IDataType<T = any> {
-  message: string;
-  data: T;
-  status: string;
+    message: string;
+    data: T;
+    status: string;
 }
 
 // const api = axios.create({

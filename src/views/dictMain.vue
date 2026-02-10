@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 // import { clearInterval } from "timers";
 
@@ -32,6 +32,8 @@ import inputPanel from "@/components/dictInputPanel.vue";
 import wordPanel from "@/components/dictWordPanel.vue";
 import dictPanel from "@/components/dictDictPanel.vue";
 import bottomPanel from "@/components/dictBottomPanel.vue";
+
+import type { ITabInfo } from "@/stores/dict/types";
 
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
@@ -90,7 +92,7 @@ const queryWord = async (word: string) => {
   // dictState.curDictId = dictId;
 };
 
-// TO-DO: status of QueryPrev button
+// TODO: status of QueryPrev button
 const handleQueryWord = async () => {
   if (childInputRef.value) {
     const childInput = childInputRef.value;
@@ -100,14 +102,14 @@ const handleQueryWord = async () => {
   }
 };
 
-// TO-DO: status of button
+// TODO: status of button
 const handleQueryNext = async () => {
   dictStore.getNextWordAct().then((word: string) => {
     queryWord(word);
   });
 };
 
-// TO-DO: status of button
+// TODO: status of button
 const handleQueryPrev = async () => {
   dictStore.getPrevWordAct().then((word: string) => {
     queryWord(word);
@@ -125,6 +127,17 @@ const handleSwitchTab = (dictId: number) => {
   }
   dictState.curDictId = dictId;
 };
+
+onMounted(()=>{
+
+  // window.electron.ipcRenderer.invoke('app', 'log', "info", "App Vue");
+
+  dictStore.getTabsInfoAct().then((tabs: ITabInfo[]) => {
+    dictState.tabsInfo = tabs;
+    console.log(`Startup: ${JSON.stringify(dictState.tabsInfo)}`);
+  });
+})
+
 </script>
 
 <style scoped>

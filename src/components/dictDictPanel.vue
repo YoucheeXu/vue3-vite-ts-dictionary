@@ -110,7 +110,7 @@ watchEffect(() => {
   editableTabs.value = dictState.tabsInfo;
 });
 
-// TO-DO: Not implemented
+// TODO: Not implemented
 const handleTabsEdit = (targetName: TabPaneName | undefined, action: "remove" | "add") => {
   if (action === "add") {
     const newTabIdx = ++tabIndex;

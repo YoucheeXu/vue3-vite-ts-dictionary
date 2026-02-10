@@ -26,6 +26,11 @@ const router = createRouter({
             // which is lazy-loaded when the route is visited.
             component: () => import("@/views/dictAbout.vue"),
         },
+        {
+            path: "/recite",
+            name: "recite words",
+            component: () => import("@/views/reciteMain.vue"),
+        },
     ],
 });
 
