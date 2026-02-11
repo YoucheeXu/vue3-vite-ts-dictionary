@@ -47,7 +47,7 @@ const stats = reactive({
 const studyTestModeRef = ref<InstanceType<typeof StudyTestMode> | null>(null);
 
 const start2Recite = () => {
-    reciteStore.reciteState
+    // reciteStore.reciteState
 
     dialogVisibleRef.value = true
 
@@ -77,7 +77,7 @@ const handleReciteFinish = () => {
 const handleKeyDown = async (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
         if (!isFinishedRef.value) {
-            await start2Recite()
+            start2Recite()
         }
     } else if (e.key == 'Esc') {
         ElMessage.info('正在退出学习模式...');
@@ -90,14 +90,25 @@ const handleKeyDown = async (e: KeyboardEvent) => {
 onMounted(async () => {
     window.addEventListener('keydown', handleKeyDown);
 
+    const isPyWebviewReady = await rootState.waitForPyWebview();
+    if (!isPyWebviewReady) {
+        ElMessage.warning('pywebview API unavailable');
+        return
+    }
+
     await rootState.fullscreen();
-    reciteStore.start2Recite()
-        .then(([allCount, newCount, fnshdCount, inProgressCount]: [number, number, number, number]) => {
-            stats.allWords = allCount;
-            stats.newWords = newCount;
-            stats.needLearn = inProgressCount;
-            stats.recited = fnshdCount;
-        });
+    // reciteStore.start2Recite()
+    //     .then(([allCount, newCount, fnshdCount, inProgressCount]: [number, number, number, number]) => {
+    //         stats.allWords = allCount;
+    //         stats.newWords = newCount;
+    //         stats.needLearn = inProgressCount;
+    //         stats.recited = fnshdCount;
+    //     });
+    const [allCount, newCount, fnshdCount, inProgressCount]: [number, number, number, number] = await reciteStore.start2Recite();
+    stats.allWords = allCount;
+    stats.newWords = newCount;
+    stats.needLearn = inProgressCount;
+    stats.recited = fnshdCount;
 })
 
 onUnmounted(() => window.removeEventListener('keydown', handleKeyDown))
