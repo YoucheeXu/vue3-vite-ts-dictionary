@@ -11,7 +11,7 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            redirect: "/main",
+            redirect: "/recite",
         },
         {
             path: "/main",
