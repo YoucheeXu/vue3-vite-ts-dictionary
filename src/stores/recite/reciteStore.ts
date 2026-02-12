@@ -57,6 +57,11 @@ export const useReciteStore = defineStore("dictState", () => {
         return num2Learn;
     }
 
+    function buildURL(url: string){
+        const baseURL = import.meta.env.VITE_BASE_URL;
+        return `${baseURL}/${url}`;
+    }
+
     async function studyNext(): Promise<
             [string, string, string, string, string, number, number]> {
         const result = await requestStudyNext();
@@ -67,10 +72,15 @@ export const useReciteStore = defineStore("dictState", () => {
         const score = ret.score;
         const word = ret.word;
         const phonetic = ret.phonetic;
-        const audioURL = ret.audioURL;
-        const dictURL = ret.dictURL;
+
+        const dictURL = buildURL(ret.dictURL);
+        console.debug(`dictURL = ${dictURL}`);
+        const audioURL = buildURL(ret.audioURL);
+        console.debug(`audioURL = ${audioURL}`);
+
         const curLearnIndex = ret.curLearnIndex;
         const num2Learn = ret.num2Learn;
+
         return [
             score,
             word,
@@ -101,8 +111,8 @@ export const useReciteStore = defineStore("dictState", () => {
         console.debug(`testNext: ${result.code}, ${result.data}, ${result.msg}`);
         // const ret = JSON.parse(result.data) as IRetTestNext;
         const ret = result.data as IRetTestNext;
-        const audio1URL = ret.audio1URL;
-        const dict2URL = ret.dict2URL;
+        const audio1URL = buildURL(ret.audio1URL);
+        const dict2URL = buildURL(ret.dict2URL);
         const curTestPos = ret.curTestPos;
         const curTestNum = ret.curTestNum;
         return [audio1URL, dict2URL, curTestPos, curTestNum];
@@ -118,8 +128,8 @@ export const useReciteStore = defineStore("dictState", () => {
         const ret = result.data as IRetCheckInput;
         const score = ret.score;
         const action = ret.action;
-        const audioURL = ret.audioURL;
-        const dictURL = ret.dictURL;
+        const audioURL = buildURL(ret.audioURL);
+        const dictURL = buildURL(ret.dictURL);
         const num2Learn = ret.num2Learn;
         const curCount = ret.curCount;
         const testTimes = ret.testTimes;
