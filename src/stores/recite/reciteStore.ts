@@ -32,11 +32,14 @@ export const useReciteStore = defineStore("dictState", () => {
         [number, number, number, number]
     > {
         const result = await requestStart2Recite();
-        console.debug(`start2Recite = ${JSON.stringify(result)}`);
-        const countData = JSON.parse(result.data) as ICountDetail;
+        // console.debug(`start2Recite = ${JSON.stringify(result)}`);
+        console.debug(`start2Recite: ${result.code}, ${result.data}, ${result.msg}`);
+        // const countData = JSON.parse(result.data) as ICountDetail;
+        const countData = result.data as ICountDetail;
+        console.debug(`countData: ${countData}`);
         const allCount = countData.allCount;
         const newCount = countData.newCount;
-        const fnshdCount = countData.fnshedCount;
+        const fnshdCount = countData.fnshdCount;
         const inProgressCount = countData.inProgressCount;
         reciteState.num2Learn = countData.num2Learn;
         reciteState.num2Test = countData.num2Test;
@@ -46,8 +49,10 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function goStudyMode(): Promise<number> {
         const result = await requestGoStudyMode();
-        console.debug(`goStudyMode = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetGoStudyMode;
+        // console.debug(`goStudyMode = ${JSON.stringify(result)}`);
+        console.debug(`goStudyMode: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetGoStudyMode;
+        const ret = result.data as IRetGoStudyMode;
         const num2Learn = ret.num2Learn;
         return num2Learn;
     }
@@ -55,8 +60,10 @@ export const useReciteStore = defineStore("dictState", () => {
     async function studyNext(): Promise<
             [string, string, string, string, string, number, number]> {
         const result = await requestStudyNext();
-        console.debug(`studyNext = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetStudyNext;
+        // console.debug(`studyNext = ${JSON.stringify(result)}`);
+        console.debug(`studyNext: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetStudyNext;
+        const ret = result.data as IRetStudyNext;
         const score = ret.score;
         const word = ret.word;
         const phonetic = ret.phonetic;
@@ -77,8 +84,10 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function goTestMode(): Promise<[number, number, number, number]> {
         const result = await requestGoTestMode();
-        console.debug(`goTestMode = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetGoTestMode;
+        // console.debug(`goTestMode = ${JSON.stringify(result)}`);
+        console.debug(`goTestMode: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetGoTestMode;
+        const ret = result.data as IRetGoTestMode;
         const action = ret.action;
         const curCount = ret.curCount;
         const testTimes = ret.testTimes;
@@ -88,8 +97,10 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function testNext(): Promise<[string, string, number, number]> {
         const result = await requestTestNext();
-        console.debug(`testNext = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetTestNext;
+        // console.debug(`testNext = ${JSON.stringify(result)}`);
+        console.debug(`testNext: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetTestNext;
+        const ret = result.data as IRetTestNext;
         const audio1URL = ret.audio1URL;
         const dict2URL = ret.dict2URL;
         const curTestPos = ret.curTestPos;
@@ -101,8 +112,10 @@ export const useReciteStore = defineStore("dictState", () => {
         [string, ActEnum, string, string, number, number, number, number]
     > {
         const result = await requestCheckInput(word);
-        console.debug(`checkInput = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetCheckInput;
+        // console.debug(`checkInput = ${JSON.stringify(result)}`);
+        console.debug(`checkInput: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetCheckInput;
+        const ret = result.data as IRetCheckInput;
         const score = ret.score;
         const action = ret.action;
         const audioURL = ret.audioURL;
@@ -125,7 +138,8 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function forget(): Promise<[ActEnum, number, number, number]> {
         const result = await requestForget();
-        console.debug(`forget = ${JSON.stringify(result)}`);
+        // console.debug(`forget = ${JSON.stringify(result)}`);
+        console.debug(`forget: ${result.code}, ${result.data}, ${result.msg}`);
         const ret = result.data as IRetActWord;
         const action = ret.action;
         const curCount = ret.curCount;
@@ -136,8 +150,10 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function chop(): Promise<[ActEnum, number, number, number]> {
         const result = await requestChop();
-        console.debug(`chop = ${JSON.stringify(result)}`);
-        const ret = JSON.parse(result.data) as IRetActWord;
+        // console.debug(`chop = ${JSON.stringify(result)}`);
+        console.debug(`chop: ${result.code}, ${result.data}, ${result.msg}`);
+        // const ret = JSON.parse(result.data) as IRetActWord;
+        const ret = result.data as IRetActWord;
         const action = ret.action;
         const curCount = ret.curCount;
         const testTimes = ret.testTimes;
@@ -147,7 +163,8 @@ export const useReciteStore = defineStore("dictState", () => {
 
     async function saveProgress(): Promise<void> {
         const result = await requestSaveProgress();
-        console.debug(`saveProgress = ${JSON.stringify(result)}`);
+        // console.debug(`saveProgress = ${JSON.stringify(result)}`);
+        console.debug(`saveProgress: ${result.code}, ${result.data}, ${result.msg}`);
     }
 
     return {

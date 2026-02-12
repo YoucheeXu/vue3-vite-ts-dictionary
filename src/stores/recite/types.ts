@@ -12,7 +12,7 @@ export interface IReciteState {
 export interface ICountDetail {
     allCount: number;
     newCount: number;
-    fnshedCount: number;
+    fnshdCount: number;
     inProgressCount: number;
     num2Learn: number;
     num2Test: number;
