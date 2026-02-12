@@ -6,9 +6,9 @@ export interface IRetType<T = any> {
     msg: string;
 }
 
-export function requestStart2Recite(level: string) {
+export function requestStart2Recite() {
     return NetRquest.get<IRetType>({
-        url: `/recite/start2recite/${level}/`,
+        url: `/recite/start2recite/`,
     });
 }
 

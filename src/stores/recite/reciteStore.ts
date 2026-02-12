@@ -31,7 +31,7 @@ export const useReciteStore = defineStore("dictState", () => {
     async function start2Recite(): Promise<
         [number, number, number, number]
     > {
-        const result = await requestStart2Recite(reciteState.level);
+        const result = await requestStart2Recite();
         console.debug(`start2Recite = ${JSON.stringify(result)}`);
         const countData = JSON.parse(result.data) as ICountDetail;
         const allCount = countData.allCount;
