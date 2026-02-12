@@ -23,13 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRootStore } from "@/stores/root";
 import { useReciteStore } from "@/stores/recite/reciteStore";
 import StudyTestMode from '@/components/studyTestMode.vue'
 
-const titleRef = ref("Study Mode");
+const titleRef = ref("Unkown Mode");
 const dialogVisibleRef = ref(false)
 const isFinishedRef = ref(false)
 const strtBtnTextRef = ref('Start to Recite(␣)')
@@ -46,16 +46,22 @@ const stats = reactive({
 
 const studyTestModeRef = ref<InstanceType<typeof StudyTestMode> | null>(null);
 
-const start2Recite = () => {
+const start2Recite = async () => {
     // reciteStore.reciteState
 
     dialogVisibleRef.value = true
 
-    if (reciteStore.reciteState.num2Learn > 0) {
-        studyTestModeRef.value?.goStudyMode();
-    } else {
-        studyTestModeRef.value?.goTestMode();
-    }
+    nextTick(async () => {
+        if (studyTestModeRef.value) {
+            if (reciteStore.reciteState.num2Learn > 0) {
+                studyTestModeRef.value?.goStudyMode();
+            } else {
+                studyTestModeRef.value?.goTestMode();
+            }
+        } else {
+            console.error("component StudyTestMode is not ready!")
+        }
+    })
 }
 
 const handleChangeTitle = (payload: { title: string }) => {
