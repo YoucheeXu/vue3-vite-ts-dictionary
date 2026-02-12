@@ -90,10 +90,9 @@ const handleKeyDown = async (e: KeyboardEvent) => {
 onMounted(async () => {
     window.addEventListener('keydown', handleKeyDown);
 
-    const isPyWebviewReady = await rootState.waitForPyWebview();
-    if (!isPyWebviewReady) {
+    rootState.rootState.isPyWebviewReady = await rootState.waitForPyWebview();
+    if (!rootState.rootState.isPyWebviewReady) {
         ElMessage.warning('pywebview API unavailable');
-        return
     }
 
     await rootState.fullscreen();

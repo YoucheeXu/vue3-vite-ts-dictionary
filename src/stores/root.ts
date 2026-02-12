@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 export interface IRootState {
   baseURL: string;
   timeout: number;
+  isPyWebviewReady: boolean;
 }
 
 export const useRootStore = defineStore("rootState", () => {
@@ -11,9 +12,10 @@ export const useRootStore = defineStore("rootState", () => {
         // baseURL: "http://127.0.0.1:5000",
         baseURL: "/api",
         timeout: 1000,
+        isPyWebviewReady: false
     };
 
-    async function waitForPyWebview(timeout: number = 1000) {
+    async function waitForPyWebview(timeout: number = 1000): Promise<boolean> {
         return new Promise((resolve) => {
             const interval = setInterval(()=>{
                 // check if pywebview.api exists
@@ -32,14 +34,22 @@ export const useRootStore = defineStore("rootState", () => {
     }
 
     async function fullscreen() {
-        const result = window.pywebview.api.invoke("fullscreen");
-        console.debug(result);
+        if (rootState.isPyWebviewReady) {
+            const result = window.pywebview.api.invoke("fullscreen");
+            console.debug(result);
+        } else {
+            // document.documentElement.requestFullscreen();
+        }
     }
 
     async function quit(): Promise<void> {
         // window.ipc.invoke("app", "quit");
-        const result = window.pywebview.api.invoke("quit");
-        console.debug(result);
+        if (rootState.isPyWebviewReady) {
+            const result = window.pywebview.api.invoke("quit");
+            console.debug(result);
+        } else {
+
+        }
     }
 
     return {
