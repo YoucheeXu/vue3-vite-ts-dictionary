@@ -1,14 +1,9 @@
 import NetRquest from "../index";
 
-interface IDataType<T = any> {
+export interface IRetType<T = any> {
     code: number;
-    msg: string;
     data: T;
-}
-
-interface IRetType{
-    response: IDataType;
-    code: number;
+    msg: string;
 }
 
 export function requestStart2Recite(level: string) {
