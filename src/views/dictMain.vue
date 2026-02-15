@@ -12,6 +12,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { ElMessage } from 'element-plus';
 
 // import { clearInterval } from "timers";
 import { useConfigStore } from "@/stores/configStore";
@@ -124,14 +125,20 @@ const handleSwitchTab = (dictId: number) => {
   dictState.curDictId = dictId;
 };
 
-onMounted(() => {
-
+onMounted(async () => {
   // window.electron.ipcRenderer.invoke('app', 'log', "info", "App Vue");
-  const guiCfg = configStore.config.Dictionary.GUI;
-  const width = guiCfg.Width;
-  console.debug(`width = ${width}`);
-  const height = guiCfg.Height;
-  console.debug(`height = ${height}`);
+
+  rootStore.rootState.isPyWebviewReady = await rootStore.waitForPyWebview();
+  if (!rootStore.rootState.isPyWebviewReady) {
+    ElMessage.warning('pywebview API unavailable');
+  } else {
+    const guiCfg = configStore.config.Dictionary.GUI;
+    const width = guiCfg.Width;
+    console.debug(`width = ${width}`);
+    const height = guiCfg.Height;
+    console.debug(`height = ${height}`);
+    rootStore.resize(width, height);
+  }
 
   dictStore.getTabsInfoAct().then((tabs: ITabInfo[]) => {
     dictState.tabsInfo = tabs;

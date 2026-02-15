@@ -39,6 +39,17 @@ export const useRootStore = defineStore("rootState", () => {
     console.debug(result)
   }
 
+  async function resize(width: number, height: number): Promise<void> {
+    try {
+        // const params = [width, height];
+        const result = window.pywebview.api.invoke("resize", width, height);
+        // const result = window.pywebview.api.invoke("resize", width);
+        console.debug(result)
+    } catch(error){
+        console.error(error);
+    }
+  }
+
   async function top(isTop: boolean) {
     const result = window.pywebview.api.invoke("top", (isTop = isTop));
     console.debug(result)
@@ -67,6 +78,7 @@ export const useRootStore = defineStore("rootState", () => {
         rootState,
         waitForPyWebview,
         minimize,
+        resize,
         top,
         fullscreen,
         quit
