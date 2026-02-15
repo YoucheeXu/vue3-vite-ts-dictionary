@@ -11,7 +11,7 @@ export async function fetchConfigFromPublicFolder(): Promise<AppConfig> {
   try {
     // Fetch JSON from public folder (browser-only fetch API)
     // Ensure app.config.json is copied to /public folder!
-    const response = await fetch("/public/Dictionary.json");
+    const response = await fetch("/Dictionary.json");
     
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status} (${response.statusText})`);
