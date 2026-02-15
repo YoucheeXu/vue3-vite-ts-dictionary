@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { useRootStore } from "@/stores/root";
+import { useRootStore } from "@/stores/rootStore";
 import { useReciteStore } from "@/stores/recite/reciteStore";
 import StudyTestMode from '@/components/studyTestMode.vue'
 

@@ -11,11 +11,11 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            redirect: "/recite",
+            redirect: "/dict",
         },
         {
-            path: "/main",
-            name: "main",
+            path: "/dict",
+            name: "dict",
             component: () => import("@/views/dictMain.vue"),
         },
         {

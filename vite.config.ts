@@ -2,76 +2,79 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 // import path from "path";
 import { fileURLToPath, URL } from "node:url";
+import { getValidatedAppConfig } from "./src/config/nodeConfigUtils";
 
-// 正确的 Vite 配置（TS 类型兼容）
+// Get validated Server config (from shared config utility)
+const appConfig = getValidatedAppConfig();
+const serverConfig = appConfig.Server;
+
 export default defineConfig({
-    // 🔥 核心修正：base 移到根级别（全局配置）
-    base: "./", // 相对公共路径，适配 HTTP 服务器加载
+    base: "./", // Relative public path to adapt to HTTP server loading
     plugins: [vue()],
-    // 开发环境配置（可选，保留）
+    // Development environment configuration (optional, kept for compatibility)
     server: {
-        // host: true, // 0.0.0.0
+        // host: true, // Bind to 0.0.0.0 (listen on all network interfaces)
         host: "localhost",
         port: 5173,
         strictPort: false,
-        open: true, // 可选：启动dev服务时自动打开浏览器
-        // 核心：配置跨域代理
+        open: true, // Optional: Auto-open browser when dev server starts
+        // Core: Configure cross-origin proxy
         proxy: {
-            // 匹配以/api开头的请求（可自定义前缀）
+            // Match requests starting with "/api" (customizable prefix)
             "/api": {
-                target: "http://127.0.0.1:5000", // 后端接口基础地址
-                changeOrigin: true, // 开启跨域代理（关键）
+                target: serverConfig.proxyUrl, // Backend API base URL
+                changeOrigin: true, // Enable cross-origin proxy (critical for CORS)
                 rewrite: (path) => {
-                    // 第一步：打印rewrite前后的路径（前端请求路径）
-                    console.log("代理前的路径：", path); // 会在前端终端打印 /api/dicts/-1/able
-                    const newPath = path.replace(/^\/api/, ""); // 去掉/api前缀（适配后端接口）
-                    console.log("代理后的路径：", newPath); // 会打印 /dicts/-1/able
+                    // Step 1: Log path before/after rewrite (frontend request path)
+                    console.log("Path before proxy rewrite: ", path); // Logs example: /api/dicts/-1/able in frontend terminal
+                    const newPath = path.replace(/^\/api/, ""); // Remove "/api" prefix to match backend API structure
+                    console.log("Path after proxy rewrite: ", newPath); // Logs example: /dicts/-1/able
                     return newPath;
                 },
-                // 第二步：配置代理事件，打印完整转发URL
+                // Step 2: Configure proxy events to log full forwarded URL
                 configure: (proxy, options) => {
-                    // 监听代理请求发送前的事件
+                    // Listen to event before proxy request is sent
                     proxy.on("proxyReq", (proxyReq, req, res) => {
-                        // 拼接完整的转发URL：target + 重写后的路径
-                        const target = options.target as string; // 后端基础地址（http://127.0.0.1:5000）
-                        const path = proxyReq.path; // 重写后的路径（如/dicts/、/dicts/-1/able）
+                        // Assemble full forwarded URL: target + rewritten path
+                        const target = options.target as string; // Backend base URL (e.g., http://127.0.0.1:5000)
+                        const path = proxyReq.path; // Rewritten path (e.g., /dicts/, /dicts/-1/able)
                         const fullForwardUrl = `${target}${path}`;
 
-                        // 打印核心信息：前端请求URL → 代理转发URL
+                        // Log core info: Frontend request URL → Proxy forwarded URL
                         console.log(
-                            "\n==================== 代理转发日志 ===================="
+                            "\n==================== Proxy Forward Log ===================="
                         );
                         console.log(
-                            `前端请求URL：http://localhost:5173${req.url}`
+                            `Frontend Request URL: http://localhost:5173${req.url}`
                         );
-                        console.log(`代理转发URL：${fullForwardUrl}`);
+                        console.log(`Proxy Forwarded URL: ${fullForwardUrl}`);
                         console.log(
                             "=====================================================\n"
                         );
                     });
 
-                    // 可选：监听代理响应事件，打印后端返回状态
+                    // Optional: Listen to proxy response event to log backend status code
                     proxy.on("proxyRes", (proxyRes, req, res) => {
-                        // 若请求是音频文件，强制设置正确的Content-Type（兜底）
+                        // Force set correct Content-Type for audio files (fallback fix)
                         if (req.url?.includes(".mp3")) {
                             proxyRes.headers["Content-Type"] = "audio/mpeg";
                         }
                         console.log(
-                            `[代理响应] 后端状态码：${proxyRes.statusCode}`
+                            `[Proxy Response] Backend Status Code: ${proxyRes.statusCode}`
                         );
                     });
                 },
             },
         },
     },
-    // 生产环境打包配置
+    // Production build configuration
     build: {
-        outDir: "../dist", // 打包输出到项目根目录的 dist
-        assetsDir: "assets", // 静态资源目录
-        target: "ESNext", // 兼容目标
-        emptyOutDir: true, // 打包前清空 outDir
+        outDir: "../dist", // Build output to "dist" folder in project root directory
+        assetsDir: "assets", // Static assets directory
+        target: "ESNext", // Compatibility target (JavaScript version)
+        emptyOutDir: true, // Clear output directory before building
     },
-    // 路径别名配置
+    // Path alias configuration
     resolve: {
         alias: {
             // "@": path.resolve(__dirname, "./src"),

@@ -1,13 +1,10 @@
 {
 	"Server": {
-		"ip": "http://127.0.0.1:5000"
+		"proxyUrl": "http://192.168.1.5:5000",
+		"apiPrefix": "/api",
+		"timeout": 5000,
+		"enableMock": false
 	},
-	"Users": [
-		{
-			"Name": "anonymous",
-			"Progress": "users/anonymous.progress"
-		}
-	],
 	"Dictionary":{
 		"GUI": {
 			"Skin": "Skin/",
@@ -31,11 +28,7 @@
 			}
 		],
 		"TabId": 1,
-		"User": "anonymous",
-		"Debug": {
-			"bEnable": false,
-			"file": "logs/Dictionary.log"
-		}
+		"User": "anonymous"
 	},
 	"ReciteWords":{
 		"GUI": {
@@ -45,12 +38,9 @@
 			"Height": 551,
 			"Width": 701
 		},
-		"User": "anonymous",
-		"DictId": 2,
-		"AudioBase": "US",
-		"Debug": {
-			"Enable": true,
-			"file": "logs/ReciteWords.log"
-		}		
+		"User": "XYQ",
+		"Target": "IELTS",
+		"DictId": 1,
+		"AudioId": 1
 	}
 }
