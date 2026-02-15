@@ -17,23 +17,6 @@ export const useDictStore = defineStore("dictState", () => {
     return configStore.config.Server.apiPrefix; // e.g., "/api"
   });
 
-  async function minimizeAct(): Promise<void> {
-    // window.ipc.invoke("app", "minimize");
-    const result = window.pywebview.api.invoke("minimize");
-    console.debug(result)
-  }
-
-  async function quitAct(): Promise<void> {
-    // window.ipc.invoke("app", "quit");
-    const result = window.pywebview.api.invoke("quit");
-    console.debug(result)
-  }
-
-  async function topAct(isTop: boolean) {
-    const result = window.pywebview.api.invoke("top", (isTop = isTop));
-    console.debug(result)
-  }
-
   async function getDictsInfoAct(): Promise<IDictInfo[]> {
     // const dictsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as IDictInfo[];
     const result = await requestDictsInfo();
@@ -97,9 +80,6 @@ export const useDictStore = defineStore("dictState", () => {
 
   return {
     dictState,
-    minimizeAct,
-    quitAct,
-    topAct,
     getDictsInfoAct,
     getTabsInfoAct,
     queryWordAct,

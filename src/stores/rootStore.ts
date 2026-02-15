@@ -33,6 +33,17 @@ export const useRootStore = defineStore("rootState", () => {
         })
     }
 
+  async function minimize(): Promise<void> {
+    // window.ipc.invoke("app", "minimize");
+    const result = window.pywebview.api.invoke("minimize");
+    console.debug(result)
+  }
+
+  async function top(isTop: boolean) {
+    const result = window.pywebview.api.invoke("top", (isTop = isTop));
+    console.debug(result)
+  }
+
     async function fullscreen() {
         if (rootState.isPyWebviewReady) {
             const result = window.pywebview.api.invoke("fullscreen");
@@ -55,6 +66,8 @@ export const useRootStore = defineStore("rootState", () => {
     return {
         rootState,
         waitForPyWebview,
+        minimize,
+        top,
         fullscreen,
         quit
     };

@@ -14,9 +14,9 @@
 import { onMounted, ref } from "vue";
 
 // import { clearInterval } from "timers";
-
-import { useDictStore } from "@/stores/dict/dictStore";
 import { useConfigStore } from "@/stores/configStore";
+import { useRootStore } from "@/stores/rootStore";
+import { useDictStore } from "@/stores/dict/dictStore";
 
 import titlebar from "@/components/dictTitlebar.vue";
 import inputPanel from "@/components/dictInputPanel.vue";
@@ -26,17 +26,17 @@ import bottomPanel from "@/components/dictBottomPanel.vue";
 
 import type { ITabInfo } from "@/stores/dict/types";
 
+const configStore = useConfigStore();
+const rootStore = useRootStore();
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
 
-const configStore = useConfigStore();
-
 const handleMinimize = () => {
-  dictStore.minimizeAct();
+  rootStore.minimize();
 };
 
 const handleQuit = () => {
-  dictStore.quitAct();
+  rootStore.quit();
 };
 
 const childInputRef = ref<InstanceType<typeof inputPanel> | null>(null);
