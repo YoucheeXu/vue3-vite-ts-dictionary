@@ -53,12 +53,13 @@ const persistOptions: PersistenceOptions<ConfigStoreState> = {
 // - Uses Vue Composition API (reactive/computed) instead of Options API
 // - Explicit type definition for StoreDefinition ensures full type safety
 // ==========================
-export const useConfigStore: StoreDefinition<
-  "appConfig",        // Unique store ID (required for Pinia)
-  ConfigStoreState,   // Reactive state type (only config object)
-  {},                 // Getters type (empty - computed properties handled in setup)
-  {}                  // Actions type (empty - plain functions used for state modification)
-> = defineStore(
+// export const useConfigStore: StoreDefinition<
+//   "appConfig",        // Unique store ID (required for Pinia)
+//   ConfigStoreState,   // Reactive state type (only config object)
+//   {},                 // Getters type (empty - computed properties handled in setup)
+//   {}                  // Actions type (empty - plain functions used for state modification)
+// > = defineStore(
+export const useConfigStore = defineStore(
   "appConfig",
   () => {
     // Reactive state initialization (deep clone to avoid mutating default config)
