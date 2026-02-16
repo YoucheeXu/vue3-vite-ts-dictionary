@@ -1,12 +1,18 @@
 // service unfity interface
 import CNetRequest from "./request";
+import { useConfigStore } from "@/stores/configStore";
+
+const configStore = useConfigStore();
+const baseURL = configStore.config.Server.apiPrefix;
+const timeout = configStore.config.Server.timeout;
 
 const netRequest = new CNetRequest({
     // baseURL: "http://127.0.0.1:5000",
     // baseURL: '/api',
-    baseURL: import.meta.env.VITE_BASE_URL,
+    // baseURL: import.meta.env.VITE_BASE_URL,
+    baseURL: baseURL,
     // timeout: import.meta.env.VITE_NET_TIMEOUT,
-    timeout: 1000,
+    timeout: timeout,
     interceptors: {
         requestInterceptor: (config) => {
             const token = "";
