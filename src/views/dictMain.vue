@@ -60,7 +60,7 @@ const pronounce = () => {
 const queryWord = async (word: string) => {
   const dictId = dictState.curDictId;
   console.log(`query ${word} in ${dictId}`);
-  console.log(`current word: ${dictState.curWord} tab: ${dictState.curDictId}`);
+  console.log(`current word: ${dictState.curWord}, tab: ${dictState.curDictId}`);
 
   if (word == dictState.curWord && dictId == dictState.curDictId) {
     pronounce();
@@ -140,7 +140,7 @@ onMounted(async () => {
     rootStore.resize(width, height);
   }
 
-  dictStore.getTabsInfoAct().then((tabs: ITabInfo[]) => {
+  dictStore.getTabsInfo().then((tabs: ITabInfo[]) => {
     dictState.tabsInfo = tabs;
     console.log(`Startup: ${JSON.stringify(dictState.tabsInfo)}`);
   });

@@ -7,6 +7,7 @@ import { useConfigStore } from "@/stores/configStore";
 export const useDictStore = defineStore("dictState", () => {
   const dictState: IDictState = {
     tabsInfo: [],
+    curTabId: -1,
     curDictId: -1,
     curWord: "",
   };
@@ -17,7 +18,7 @@ export const useDictStore = defineStore("dictState", () => {
     return configStore.config.Server.apiPrefix; // e.g., "/api"
   });
 
-  async function getDictsInfoAct(): Promise<IDictInfo[]> {
+  async function getDictsInfo(): Promise<IDictInfo[]> {
     // const dictsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as IDictInfo[];
     const result = await requestDictsInfo();
     console.log(`dicts: ${result.message}, ${result.data}, ${result.status}`);
@@ -27,23 +28,25 @@ export const useDictStore = defineStore("dictState", () => {
     return dictsInfo;
   }
 
-  async function getTabsInfoAct(): Promise<ITabInfo[]> {
+  async function getTabsInfo(): Promise<ITabInfo[]> {
     // const tabsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as ITabInfo[];
 
-    const dictsInfo = await getDictsInfoAct();
+    const dictCfg = configStore.config.Dictionary;
+    dictState.curTabId = dictCfg.TabId;
 
     const tabsInfo: ITabInfo[] = [];
-    let i = 0;
-    for (const dictInfo of dictsInfo) {
-      console.log(`${dictInfo.id} = ${dictInfo.title}`);
+    for (const dictInfo of dictCfg.Tabs) {
+      console.log(`${dictInfo.TabId} = ${dictInfo.Label}`);
 
       tabsInfo.push({
-        tabId: i,
-        label: dictInfo.title,
-        dictId: dictInfo.id,
+        tabId: dictInfo.TabId,
+        label: dictInfo.Label,
+        dictId: dictInfo.DictId,
       });
 
-      i += 1;
+      if (dictInfo.TabId == dictState.curTabId){
+        dictState.curDictId = dictInfo.DictId;
+      }
     }
 
     return tabsInfo;
@@ -80,8 +83,8 @@ export const useDictStore = defineStore("dictState", () => {
 
   return {
     dictState,
-    getDictsInfoAct,
-    getTabsInfoAct,
+    getDictsInfo,
+    getTabsInfo,
     queryWordAct,
     getNextWordAct,
     getPrevWordAct,

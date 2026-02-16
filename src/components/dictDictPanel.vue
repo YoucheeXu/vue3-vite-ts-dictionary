@@ -102,9 +102,7 @@ const editableTabs = ref<ITabInfo[]>([]);
 watchEffect(() => {
   if (dictState.tabsInfo.length >= 1) {
     tabIndex = dictState.tabsInfo.length;
-    const curTab = dictState.tabsInfo[0];
-    editableTabsValue.value = curTab.tabId;
-    dictState.curDictId = curTab.dictId;
+    editableTabsValue.value = dictState.curTabId;
   }
   // console.log(rootState.tabsInfo);
   editableTabs.value = dictState.tabsInfo;
@@ -147,6 +145,7 @@ const handleClickTab = (pane: TabsPaneContext, ev: Event) => {
   console.debug(ev);
   const dictId = pane.paneName as number;
   emit("switchTab", dictId);
+  dictState.curTabId = editableTabsValue.value;
 };
 
 defineExpose({

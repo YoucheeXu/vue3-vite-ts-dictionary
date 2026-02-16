@@ -6,6 +6,7 @@ export interface ITabInfo {
 
 export interface IDictState {
   tabsInfo: ITabInfo[];
+  curTabId: number;
   curDictId: number;
   curWord: string;
 }
