@@ -52,7 +52,7 @@ export const useDictStore = defineStore("dictState", () => {
     return tabsInfo;
   }
 
-  async function queryWordAct(word: string, dictId: number): Promise<[string, string, boolean, string, number]> {
+  async function queryWord(word: string, dictId: number): Promise<[string, string, boolean, string, number]> {
     const result = await requestQueryWord(word, dictId);
     console.log(`queryWordAct = ${JSON.stringify(result)}`);
     const wordData = result.data as IWordDetail;
@@ -85,7 +85,7 @@ export const useDictStore = defineStore("dictState", () => {
     dictState,
     getDictsInfo,
     getTabsInfo,
-    queryWordAct,
+    queryWord,
     getNextWordAct,
     getPrevWordAct,
   };

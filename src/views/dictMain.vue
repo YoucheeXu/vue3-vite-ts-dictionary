@@ -59,16 +59,16 @@ const pronounce = () => {
 
 const queryWord = async (word: string) => {
   const dictId = dictState.curDictId;
-  console.log(`query ${word} in ${dictId}`);
-  console.log(`current word: ${dictState.curWord}, tab: ${dictState.curDictId}`);
+  console.log(`query ${word} in #${dictId} dict`);
+  // console.log(`current word: ${dictState.curWord}, tab: ${dictState.curDictId}`);
 
-  if (word == dictState.curWord && dictId == dictState.curDictId) {
-    pronounce();
-    return;
-  }
-  console.log(`word: ${word}, tabId: ${dictId}`);
+  // if (word == dictState.curWord && dictId == dictState.curDictId) {
+  //   pronounce();
+  //   return;
+  // }
+  // console.log(`word: ${word}, tabId: ${dictId}`);
   dictStore
-    .queryWordAct(word, dictId)
+    .queryWord(word, dictId)
     .then(([dictURL, audioURL, bNew, level, nStars]: [string, string, boolean, string, number]) => {
       wordRef.value = word;
 
@@ -122,7 +122,6 @@ const handleSwitchTab = (dictId: number) => {
       queryWord(word);
     }
   }
-  dictState.curDictId = dictId;
 };
 
 onMounted(async () => {
