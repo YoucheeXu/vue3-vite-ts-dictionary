@@ -3,9 +3,9 @@ import type { App } from "vue";
 import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/base.css";
 
-import { ElInput, ElTabs, ElTabPane, ElButton, ElDialog, ElIcon } from "element-plus";
+import { ElInput, ElTabs, ElTabPane, ElButton, ElDialog, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from "element-plus";
 
-const components = [ElInput, ElTabs, ElTabPane, ElIcon, ElButton, ElDialog];
+const components = [ElInput, ElTabs, ElTabPane, ElButton, ElDialog, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem];
 
 export default function registerElements(app: App) {
   for (const component of components) {

@@ -16,7 +16,7 @@ import type { IRetGoStudyMode, IRetStudyNext} from "./types";
 import type { IRetGoTestMode, IRetTestNext} from "./types";
 import type { IRetCheckInput, IRetActWord} from "./types";
 
-export const useReciteStore = defineStore("dictState", () => {
+export const useReciteStore = defineStore("reciteState", () => {
     const reciteState: IReciteState = {
         user: 'Youchee',
         level: "IELTS-CET6",

@@ -1,26 +1,27 @@
 <template>
   <div class="title_panel titlebar">
-    <div id="btn_menu2" class="dropdown">
+    <el-dropdown id="menu_dropdown" @command="handleDropdownCommand" ref="dropdownRef" trigger="click">
       <!-- <button class="btn" type="button" id="btn_menu" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false"></button> -->
-      <imgButton3 id="btn_menu" img="./skin/menu_btn.bmp" :width="31" :height="21" @btn-cliked="handleBtnCliked" />
+      <imgButton3 id="btn_dropmenu" img="./skin/menu_btn.bmp" :width="31" :height="21" @btn-cliked="handleBtnCliked" />
       <!-- <div class="dropdown-menu dropdown-menu-right" id="sys_menu" aria-labelledby="btn_menu">
                 <a class="dropdown-item active" href="#Action2">Another action</a>
             </div> -->
-    </div>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <!-- Custom menu items (adjust as needed) -->
+          <el-dropdown-item command="switch2Recite">Recite Words</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
     <div class="min_max_close fr">
       <!-- <button type="button" id="btn_min" style="border: none;"></button> -->
       <imgButton3 id="btn_min" img="./skin/minimize_btn.bmp" :width="33" :height="21" @btn-cliked="handleBtnCliked" />
       <!-- <button type="button" id="btn_max" style="border: none;"></button> -->
       <imgButton3 id="btn_max" img="./skin/maxmize_btn.bmp" :width="33" :height="21" @btn-cliked="handleBtnCliked" />
       <!-- <button type="button" id="btn_restore" style="border: none; display: none;"></button> -->
-      <imgButton3
-        id="btn_restore"
-        img="./skin/restore_btn.bmp"
-        :width="33"
-        :height="21"
-        @btn-cliked="handleBtnCliked"
-      />
+      <imgButton3 id="btn_restore" img="./skin/restore_btn.bmp" :width="33" :height="21"
+        @btn-cliked="handleBtnCliked" />
       <!-- <button type="button" id="btn_close" style="border: none;"></button> -->
       <imgButton3 id="btn_close" img="./skin/close_btn.bmp" :width="43" :height="21" @btn-cliked="handleBtnCliked" />
     </div>
@@ -28,9 +29,15 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import imgButton3 from "./imgButton3.vue";
 
 const emit = defineEmits(["quit", "minimize"]);
+
+const router = useRouter()
+// Ref for dropdown (to manually control show/hide if needed)
+const dropdownRef = ref(null)
 
 const handleBtnCliked = (id: string) => {
   console.log(id + " was clicked!");
@@ -48,6 +55,22 @@ const handleBtnCliked = (id: string) => {
     // rootState.info(id);
   }
 };
+
+// Handle dropdown menu item click event
+const handleDropdownCommand = (command: string) => {
+  switch (command) {
+    case 'switch2Recite':
+      // Navigate to /recite route
+      router.push('/recite').catch(err => {
+        // Catch navigation errors (e.g., duplicate navigation)
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Failed to navigate to /recite:', err)
+        }
+      })
+      break
+  }
+}
+
 </script>
 
 <style scoped>
@@ -66,7 +89,7 @@ const handleBtnCliked = (id: string) => {
   overflow: hidden;
 }
 
-#btn_menu {
+#menu_dropdown {
   position: absolute;
   left: 560px;
   top: 1px;
