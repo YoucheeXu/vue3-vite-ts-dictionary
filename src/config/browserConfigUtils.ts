@@ -24,7 +24,7 @@ export async function fetchConfigFromPublicFolder(): Promise<AppConfig> {
       typeof rawConfig !== "object" ||
       rawConfig === null ||
       !("Server" in rawConfig) ||
-      typeof (rawConfig as AppConfig).Server.proxyUrl !== "string"
+      typeof (rawConfig as AppConfig).Server.serverUrl !== "string"
     ) {
       throw new Error("Invalid Server config in browser (missing proxyUrl)");
     }

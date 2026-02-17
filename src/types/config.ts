@@ -2,7 +2,7 @@
 
 /** Server proxy configuration */
 export interface ServerConfig {
-  proxyUrl: string;
+  serverUrl: string;
   apiPrefix: string;
   timeout: number;
   enableMock: boolean;
@@ -68,7 +68,7 @@ export interface AppConfig {
 /** Default fallback configuration (updated to use unified GUI types) */
 export const DEFAULT_APP_CONFIG: AppConfig = {
   Server: {
-    proxyUrl: "http://localhost:5000",
+    serverUrl: "http://localhost:5000",
     apiPrefix: "/api",
     timeout: 5000,
     enableMock: false,

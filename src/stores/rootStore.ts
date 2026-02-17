@@ -1,5 +1,9 @@
-import { resolve } from "path";
+// import { reactive, computed } from "vue";
 import { defineStore } from "pinia";
+import { useConfigStore } from "@/stores/configStore";
+
+// Judge if current environment is local file (file:// protocol)
+// const isLocalFileEnv = window.location.protocol === 'file:'
 
 export interface IRootState {
   baseURL: string;
@@ -8,10 +12,12 @@ export interface IRootState {
 }
 
 export const useRootStore = defineStore("rootState", () => {
+    const configStore = useConfigStore();
+
     const rootState: IRootState = {
         // baseURL: "http://127.0.0.1:5000",
-        baseURL: "/api",
-        timeout: 1000,
+        baseURL: process.env.NODE_ENV === 'development'? configStore.config.Server.apiPrefix: configStore.config.Server.serverUrl,
+        timeout: configStore.config.Server.timeout,
         isPyWebviewReady: false
     };
 

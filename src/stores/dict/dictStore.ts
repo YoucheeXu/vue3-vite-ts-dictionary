@@ -1,8 +1,8 @@
-import { reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import { requestDictsInfo, requestQueryWord, requestUploadFile } from "@/service/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
+import { useRootStore } from "@/stores/rootStore";
 
 export const useDictStore = defineStore("dictState", () => {
   const dictState: IDictState = {
@@ -12,11 +12,8 @@ export const useDictStore = defineStore("dictState", () => {
     curWord: "",
   };
 
-  // Get the singleton instance of config store (reuses existing state)
   const configStore = useConfigStore();
-  const apiPrefix = computed<string>(() => {
-    return configStore.config.Server.apiPrefix; // e.g., "/api"
-  });
+  const rootState = useRootStore();
 
   async function getDictsInfo(): Promise<IDictInfo[]> {
     // const dictsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as IDictInfo[];
@@ -60,7 +57,8 @@ export const useDictStore = defineStore("dictState", () => {
     // const baseURL = import.meta.env.VITE_BASE_URL;
     // const baseURL = "http://192.168.1.5:5000";
     // const baseURL = "/api";
-    const baseURL = apiPrefix.value;
+    // const baseURL = apiPrefix.value;
+    const baseURL = rootState.rootState.baseURL;
     console.debug(`baseURL = ${baseURL}`);
     const dictURL = `${baseURL}/${wordData.dict_url}`;
     console.debug(`dictURL = ${dictURL}`);

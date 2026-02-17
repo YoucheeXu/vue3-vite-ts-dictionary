@@ -152,7 +152,7 @@ export const useConfigStore = defineStore(
     // @returns string - Full API endpoint base URL (e.g., "http://192.168.1.5:5000/api")
     // ==========================
     const apiBaseUrl = computed<string>(() => {
-      return `${config.Server.proxyUrl}${config.Server.apiPrefix}`;
+      return `${config.Server.serverUrl}${config.Server.apiPrefix}`;
     });
 
     // ==========================

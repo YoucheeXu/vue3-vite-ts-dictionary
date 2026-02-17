@@ -22,7 +22,7 @@ export default defineConfig({
         proxy: {
             // Match requests starting with "/api" (customizable prefix)
             "/api": {
-                target: serverConfig.proxyUrl, // Backend API base URL
+                target: serverConfig.serverUrl, // Backend API base URL
                 changeOrigin: true, // Enable cross-origin proxy (critical for CORS)
                 rewrite: (path) => {
                     // Step 1: Log path before/after rewrite (frontend request path)

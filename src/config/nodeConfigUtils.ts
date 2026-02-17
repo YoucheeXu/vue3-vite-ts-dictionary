@@ -36,11 +36,11 @@ export function getValidatedAppConfig(configPath?: string): AppConfig {
 
     // Validate Server config (critical for proxy)
     const serverConfig = (rawConfig as AppConfig).Server;
-    const requiredServerFields: (keyof ServerConfig)[] = ["proxyUrl", "apiPrefix", "timeout"];
+    const requiredServerFields: (keyof ServerConfig)[] = ["serverUrl", "apiPrefix", "timeout"];
     for (const field of requiredServerFields) {
       const value = serverConfig[field];
       switch (field) {
-        case "proxyUrl":
+        case "serverUrl":
         case "apiPrefix":
           if (typeof value !== "string" || value.trim() === "") {
             throw new Error(`Invalid Server.${field}: non-empty string required`);
