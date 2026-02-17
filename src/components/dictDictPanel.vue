@@ -195,7 +195,7 @@ interface FileItem {
   name: string
   size: number
   fullPath: string
-  file?: File // Only exists for file type
+  file: File
 }
 
 /**
@@ -211,6 +211,21 @@ const isFileEntry = (entry: FileSystemEntry): entry is FileSystemFileEntry => {
 // Type guard: Check if entry is FileSystemDirectoryEntry
 const isDirectoryEntry = (entry: FileSystemEntry): entry is FileSystemDirectoryEntry => {
   return entry.isDirectory
+}
+
+function dealWithFiles(filesList: FileItem[]) {
+  for (const file of filesList) {
+    const fileName = file.name
+    console.debug(`${fileName}: ${file.fullPath}`)
+    if (fileName.endsWith('.mp3')){
+      dictStore.uploadAudio(1, file.file);
+    } else if (fileName.endsWith('.json')){
+      dictStore.uploadDict(dictState.curDictId, file.file);
+    } else if (fileName.endsWith('.txt')){
+    } else {
+      throw new Error(`Unsupported file type: ${fileName} (only .json/.mp3/.txt are allowed)`);
+    }
+  }
 }
 
 /**
@@ -235,10 +250,12 @@ const handleDrop = async (e: DragEvent) => {
     if (entry) {
       if (isFileEntry(entry)) {
         await readFileEntry(entry);
-        console.debug(fileList.value);
+        // console.debug(fileList.value);
+        dealWithFiles(fileList.value);
       } else if (isDirectoryEntry(entry)) {
         await readDirectoryEntry(entry, entry.name);
-        console.debug(fileList.value);
+        // console.debug(fileList.value);
+        dealWithFiles(fileList.value);
       }
     }
   }
@@ -276,12 +293,12 @@ const readDirectoryEntry = (dirEntry: FileSystemDirectoryEntry, parentPath: stri
     const reader: FileSystemDirectoryReader = dirEntry.createReader()
     reader.readEntries(async (entries: FileSystemEntry[]) => {
       // Add folder itself to the list
-      fileList.value.push({
-        type: 'folder',
-        name: dirEntry.name,
-        size: 0, // Folders have no size by default
-        fullPath: dirEntry.fullPath
-      })
+      // fileList.value.push({
+      //   type: 'folder',
+      //   name: dirEntry.name,
+      //   size: 0, // Folders have no size by default
+      //   fullPath: dirEntry.fullPath
+      // })
 
       // Traverse sub-items of the folder
       for (const entry of entries) {

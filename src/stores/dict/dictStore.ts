@@ -1,6 +1,6 @@
 import { reactive, computed } from "vue";
 import { defineStore } from "pinia";
-import { requestDictsInfo, requestQueryWord } from "@/service/dict";
+import { requestDictsInfo, requestQueryWord, requestUploadFile } from "@/service/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
 
@@ -81,6 +81,20 @@ export const useDictStore = defineStore("dictState", () => {
     return word;
   }
 
+  async function uploadDict(dictId: number, file: File){
+    const uploadUrl = `/dicts/${dictId}/upload/${file.name}`;
+    const formData = new FormData();
+    formData.append('file', file);
+    return requestUploadFile(uploadUrl, formData);
+  }
+
+  async function uploadAudio(dictId: number, file: File){
+    const uploadUrl = `/audios/${dictId}/upload/${file.name}`;
+    const formData = new FormData();
+    formData.append('file', file);
+    return requestUploadFile(uploadUrl, formData);
+  }
+
   return {
     dictState,
     getDictsInfo,
@@ -88,5 +102,7 @@ export const useDictStore = defineStore("dictState", () => {
     queryWord,
     getNextWordAct,
     getPrevWordAct,
+    uploadDict,
+    uploadAudio
   };
 });
