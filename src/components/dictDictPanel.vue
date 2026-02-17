@@ -10,21 +10,18 @@
       <!-- <option>word 5</option> -->
     </select>
     <!--/div-->
-    <div id="contents_box" class="" style="overflow-y: auto; height: 430px; width: 701px; float: left">
-      <div class="Word" />
-      <div id="tabContainer">
+    <div id="contents_box" class="" style="overflow-y: auto; height: 430px; width: 701px; float: left"
+      @dragenter="handleDragEnter" @dragover="handleDragOver" @dragleave="handleDragLeave" @drop="handleDrop">
+      <!-- <div class="Word" /> -->
+      <div id="tabContainer" style="width: 100%; height: 100%; position: relative; z-index: 10;">
         <el-tabs v-model="editableTabsValue" type="card" editable @edit="handleTabsEdit" @tab-click="handleClickTab">
-          <el-tab-pane v-for="item in editableTabs" :key="item.tabId" :label="item.label" :name="item.dictId">
-            <!-- <div id="dictContent" v-html="props.dictContent"></div> -->
-            <iframe
-              :src="props.dictURL"
-              style="position: relative; width: 701px; height: 314px"
-              frameborder="0"
-              marginwidth="0"
-              marginheight="0"
-              allowtransparency="true"
-              sandbox="allow-same-origin allow-scripts"
-            ></iframe>
+          <el-tab-pane v-for="item in editableTabs" :key="item.tabId" :label="item.label" :name="item.dictId"
+            class="drop-area" :class="{ 'drop-area--active': isDragging }">
+            <iframe :src="props.dictURL" style="position: relative; width: 701px; height: 314px" frameborder="0"
+              marginwidth="0" marginheight="0" allowtransparency="true" sandbox="allow-same-origin allow-scripts"
+              :style="{ pointerEvents: isDragging ? 'none' : 'auto' }" @dragenter.stop.prevent @dragover.stop.prevent
+              @drop.stop.prevent>
+            </iframe>
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -37,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, Ref, watchEffect } from "vue";
 import { useDictStore } from "@/stores/dict/dictStore";
 import type { TabsPaneContext } from "element-plus";
 import type { TabPaneName } from "element-plus";
@@ -47,6 +44,9 @@ const props = defineProps<{ dictURL: string }>();
 
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
+
+// State: whether dragging over the area
+const isDragging = ref(false)
 
 let tabIndex = 1;
 const editableTabsValue = ref(1);
@@ -148,6 +148,167 @@ const handleClickTab = (pane: TabsPaneContext, ev: Event) => {
   dictState.curTabId = editableTabsValue.value;
 };
 
+/**
+ * Handle drag enter event
+ * @param e DragEvent - Native drag enter event
+ */
+const handleDragEnter = (e: DragEvent) => {
+  e.preventDefault() // Block default behavior
+  e.stopPropagation()
+  isDragging.value = true
+}
+
+/**
+ * Handle drag over event (critical to allow drop)
+ * @param e DragEvent - Native drag over event
+ */
+const handleDragOver = (e: DragEvent) => {
+  e.preventDefault() // Critical: Block default to allow drop
+  e.stopPropagation()
+  isDragging.value = true
+  // Specify accepted types (optional: only accept files/folders)
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'copy' // Set drop effect to copy
+  }
+}
+
+/**
+ * Handle drag leave event
+ * @param e DragEvent - Native drag leave event
+ */
+const handleDragLeave = (e: DragEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+  // Only set to false if mouse leaves the entire drop area (avoid false trigger on child elements)
+  const currentTarget = e.currentTarget as HTMLElement | null
+  const relatedTarget = e.relatedTarget as HTMLElement | null
+  if (currentTarget && relatedTarget && !currentTarget.contains(relatedTarget)) {
+    isDragging.value = false
+  }
+}
+
+/**
+ * Type of dragged item (file/folder)
+ */
+interface FileItem {
+  type: 'file' | 'folder'
+  name: string
+  size: number
+  fullPath: string
+  file?: File // Only exists for file type
+}
+
+/**
+ * List of dragged files/folders (typed as FileItem[])
+ */
+const fileList: Ref<FileItem[]> = ref([])
+
+// Type guard: Check if entry is FileSystemFileEntry
+const isFileEntry = (entry: FileSystemEntry): entry is FileSystemFileEntry => {
+  return entry.isFile
+}
+
+// Type guard: Check if entry is FileSystemDirectoryEntry
+const isDirectoryEntry = (entry: FileSystemEntry): entry is FileSystemDirectoryEntry => {
+  return entry.isDirectory
+}
+
+/**
+ * Handle drop event (core logic to parse files/folders)
+ * @param e DragEvent - Native drop event
+ */
+const handleDrop = async (e: DragEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+  isDragging.value = false
+
+  // Clear previous list
+  fileList.value = []
+
+  // Get drag data (DataTransfer object)
+  const items = e.dataTransfer?.items as DataTransferItem[] | undefined;
+  if (!items || items.length === 0) return;
+
+  // Parse each dragged item
+  for (const item of items) {
+    const entry = item.webkitGetAsEntry();
+    if (entry) {
+      if (isFileEntry(entry)) {
+        await readFileEntry(entry);
+        console.debug(fileList.value);
+      } else if (isDirectoryEntry(entry)) {
+        await readDirectoryEntry(entry, entry.name);
+        console.debug(fileList.value);
+      }
+    }
+  }
+}
+
+// Parse single file entry
+/**
+ * Read a single file entry and add to fileList
+ * @param fileEntry FileSystemFileEntry - Native file entry object
+ * @returns Promise<void>
+ */
+const readFileEntry = (fileEntry: FileSystemFileEntry): Promise<void> => {
+  return new Promise((resolve) => {
+    fileEntry.file((file: File) => {
+      fileList.value.push({
+        type: 'file',
+        name: file.name,
+        size: file.size,
+        fullPath: fileEntry.fullPath,
+        file: file
+      })
+      resolve()
+    })
+  })
+}
+
+/**
+ * Recursively read directory entry (supports nested folders)
+ * @param dirEntry FileSystemDirectoryEntry - Native directory entry object
+ * @param parentPath string - Parent folder path (for nested path calculation)
+ * @returns Promise<void>
+ */
+const readDirectoryEntry = (dirEntry: FileSystemDirectoryEntry, parentPath: string): Promise<void> => {
+  return new Promise((resolve) => {
+    const reader: FileSystemDirectoryReader = dirEntry.createReader()
+    reader.readEntries(async (entries: FileSystemEntry[]) => {
+      // Add folder itself to the list
+      fileList.value.push({
+        type: 'folder',
+        name: dirEntry.name,
+        size: 0, // Folders have no size by default
+        fullPath: dirEntry.fullPath
+      })
+
+      // Traverse sub-items of the folder
+      for (const entry of entries) {
+        if (isFileEntry(entry)) {
+          await readFileEntry(entry)
+        } else if (isDirectoryEntry(entry)) {
+          await readDirectoryEntry(entry, `${parentPath}/${entry.name}`)
+        }
+      }
+      resolve()
+    })
+  })
+}
+
+/**
+ * Format file size (bytes → KB/MB/GB)
+ * @param bytes number - File size in bytes
+ * @returns string - Formatted size string (e.g., "2.56 MB")
+ */
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB'] as const
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+}
+
 defineExpose({
   editableTabsValue,
 });
@@ -167,5 +328,20 @@ defineExpose({
   border: 0;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.drop-area {
+  width: 80%;
+  height: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.drop-area--active {
+  border-color: #409eff;
+  background-color: #f5f8ff;
 }
 </style>
