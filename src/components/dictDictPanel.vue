@@ -10,7 +10,7 @@
       <!-- <option>word 5</option> -->
     </select>
     <!--/div-->
-    <div id="contents_box" class="" style="overflow-y: auto; height: 430px; width: 701px; float: left"
+    <div id="contents_box" style="overflow-y: auto; height: 430px; width: 701px; float: left"
       @dragenter="handleDragEnter" @dragover="handleDragOver" @dragleave="handleDragLeave" @drop="handleDrop">
       <!-- <div class="Word" /> -->
       <div id="tabContainer" style="width: 100%; height: 100%; position: relative; z-index: 10;">
@@ -217,11 +217,11 @@ function dealWithFiles(filesList: FileItem[]) {
   for (const file of filesList) {
     const fileName = file.name
     console.debug(`${fileName}: ${file.fullPath}`)
-    if (fileName.endsWith('.mp3')){
+    if (fileName.endsWith('.mp3')) {
       dictStore.uploadAudio(1, file.file);
-    } else if (fileName.endsWith('.json')){
+    } else if (fileName.endsWith('.json')) {
       dictStore.uploadDict(dictState.curDictId, file.file);
-    } else if (fileName.endsWith('.txt')){
+    } else if (fileName.endsWith('.txt')) {
     } else {
       throw new Error(`Unsupported file type: ${fileName} (only .json/.mp3/.txt are allowed)`);
     }
@@ -348,10 +348,10 @@ defineExpose({
 }
 
 .drop-area {
-  width: 80%;
-  height: 400px;
-  margin: 20px auto;
-  padding: 20px;
+  width: 100%;
+  height: 100%;
+  margin: 2px auto;
+  padding: 2px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
