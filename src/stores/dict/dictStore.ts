@@ -18,7 +18,7 @@ export const useDictStore = defineStore("dictState", () => {
   async function getDictsInfo(): Promise<IDictInfo[]> {
     // const dictsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as IDictInfo[];
     const result = await requestDictsInfo();
-    console.log(`dicts: ${result.message}, ${result.data}, ${result.status}`);
+    console.debug(`dicts: ${result.code}, ${result.data}, ${result.msg}`);
     const dictsInfo = JSON.parse(result.data) as IDictInfo[];
     console.log(`dicts = ${dictsInfo}`);
 

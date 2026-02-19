@@ -1,12 +1,24 @@
 <template>
   <div class="bottom_panel">
-    <label id="status" style="height: 20px; margin: 5px 0px 0px 5px" />
+    <label id="status" style="height: 20px; margin: 5px 0px 0px 5px">
+      {{ statusInfo }}
+    </label>
     <input id="chk_TOPMOST" type="checkbox" name="TopMost" value="TopMost" @click="handleTopMostOrNot" />
     <p id="txt_TOPMOST">Always TOP</p>
   </div>
 </template>
 
 <script setup lang="ts">
+
+const props = defineProps({
+  // Prop name: statusInfo
+  statusInfo: {
+    type: String, // Label type (string)
+    required: false, // Not mandatory (set default value)
+    default: '' // Default label if parent doesn't pass
+  }
+})
+
 const handleTopMostOrNot = () => {
   console.log("Top Most or Not");
 };
@@ -25,6 +37,11 @@ const handleTopMostOrNot = () => {
   box-sizing: border-box;
   overflow: hidden;
   background-color: #43a0ff;
+}
+
+#status {
+  line-height: 35px;
+  /* Line-height = container height → single-line vertical center */
 }
 
 #chk_TOPMOST {

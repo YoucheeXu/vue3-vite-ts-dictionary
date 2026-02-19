@@ -5,8 +5,9 @@
       @query-prev="handleQueryPrev" />
     <wordPanel ref="childWordRef" :word="wordRef" :audio-u-r-l="audioURLRef" :b-new="bNewRef" :level="levelRef"
       :n-stars="nStarsRef" />
-    <dictPanel ref="childDictRef" :dict-u-r-l="dictURLRef" @switch-tab="handleSwitchTab" />
-    <bottomPanel />
+    <dictPanel ref="childDictRef" :dict-u-r-l="dictURLRef" @switch-tab="handleSwitchTab"
+      @stats-update="handleStatsUpdate" />
+    <bottomPanel :status-info="statusInfo" />
   </div>
 </template>
 
@@ -51,6 +52,8 @@ const nStarsRef = ref(0);
 
 const childDictRef = ref(null);
 const dictURLRef = ref("");
+
+const statusInfo = ref("");
 
 const pronounce = () => {
   const childWord = childWordRef.value;
@@ -113,8 +116,9 @@ const handleQueryPrev = async () => {
   });
 };
 
-const handleSwitchTab = (dictId: number) => {
-  console.log(`switch to tab ${dictId}`);
+const handleSwitchTab = (payload: { dictId: number }) => {
+  const dictId = payload.dictId;
+  console.debug(`switch to tab ${dictId}`);
   if (childInputRef.value) {
     dictState.curDictId = dictId;
     const word = childInputRef.value.word as string;
@@ -123,6 +127,11 @@ const handleSwitchTab = (dictId: number) => {
     }
   }
 };
+
+const handleStatsUpdate = (payload: { msg: string }) => {
+  console.debug(`status: ${payload.msg}`);
+  statusInfo.value = payload.msg;
+}
 
 onMounted(async () => {
   // window.electron.ipcRenderer.invoke('app', 'log', "info", "App Vue");

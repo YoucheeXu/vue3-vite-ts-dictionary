@@ -138,13 +138,16 @@ const handleTabsEdit = (targetName: TabPaneName | undefined, action: "remove" | 
   }
 };
 
-const emit = defineEmits(["switchTab"]);
+const emit = defineEmits<{
+  "switchTab": [payload: { dictId: number }]
+  "statsUpdate": [payload: { msg: string }]
+}>()
 
 const handleClickTab = (pane: TabsPaneContext, ev: Event) => {
   // console.log(pane.paneName);
   console.debug(ev);
   const dictId = pane.paneName as number;
-  emit("switchTab", dictId);
+  emit("switchTab", { dictId });
   dictState.curTabId = editableTabsValue.value;
 };
 
@@ -213,14 +216,19 @@ const isDirectoryEntry = (entry: FileSystemEntry): entry is FileSystemDirectoryE
   return entry.isDirectory
 }
 
-function dealWithFiles(filesList: FileItem[]) {
+async function dealWithFiles(filesList: FileItem[]) {
   for (const file of filesList) {
     const fileName = file.name
     console.debug(`${fileName}: ${file.fullPath}`)
     if (fileName.endsWith('.mp3')) {
-      dictStore.uploadAudio(1, file.file);
+      const ret = await dictStore.uploadAudio(1, file.file);
+      const msg = ret.msg;
+      console.debug(`upload audio: ${msg}`);
+      emit('statsUpdate', { msg });
     } else if (fileName.endsWith('.json')) {
-      dictStore.uploadDict(dictState.curDictId, file.file);
+      const ret = await dictStore.uploadDict(dictState.curDictId, file.file);
+      const msg = ret.msg;
+      emit('statsUpdate', { msg });
     } else if (fileName.endsWith('.txt')) {
     } else {
       throw new Error(`Unsupported file type: ${fileName} (only .json/.mp3/.txt are allowed)`);
@@ -251,11 +259,11 @@ const handleDrop = async (e: DragEvent) => {
       if (isFileEntry(entry)) {
         await readFileEntry(entry);
         // console.debug(fileList.value);
-        dealWithFiles(fileList.value);
+        await dealWithFiles(fileList.value);
       } else if (isDirectoryEntry(entry)) {
         await readDirectoryEntry(entry, entry.name);
         // console.debug(fileList.value);
-        dealWithFiles(fileList.value);
+        await dealWithFiles(fileList.value);
       }
     }
   }
