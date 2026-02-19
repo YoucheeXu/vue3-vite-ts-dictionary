@@ -3,12 +3,15 @@
     <label id="status" style="height: 20px; margin: 5px 0px 0px 5px">
       {{ statusInfo }}
     </label>
-    <input id="chk_TOPMOST" type="checkbox" name="TopMost" value="TopMost" @click="handleTopMostOrNot" />
+    <input id="chk_TOPMOST" type="checkbox" v-model="isTop" />
     <p id="txt_TOPMOST">Always TOP</p>
   </div>
 </template>
 
 <script setup lang="ts">
+import {ref, watch} from 'vue';
+
+const isTop = ref(false)
 
 const props = defineProps({
   // Prop name: statusInfo
@@ -19,9 +22,13 @@ const props = defineProps({
   }
 })
 
-const handleTopMostOrNot = () => {
-  console.log("Top Most or Not");
-};
+const emit = defineEmits<{
+  "top": [payload: { isTop: boolean }]
+}>()
+
+watch(isTop, (newVal) => {
+  emit('top', {isTop: newVal});
+})
 </script>
 
 <style scoped>

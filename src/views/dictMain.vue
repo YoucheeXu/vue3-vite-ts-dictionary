@@ -7,7 +7,7 @@
       :n-stars="nStarsRef" />
     <dictPanel ref="childDictRef" :dict-u-r-l="dictURLRef" @switch-tab="handleSwitchTab"
       @stats-update="handleStatsUpdate" />
-    <bottomPanel :status-info="statusInfo" />
+    <bottomPanel :status-info="statusInfo" @top="handleTop" />
   </div>
 </template>
 
@@ -36,6 +36,10 @@ const dictState = dictStore.dictState;
 const handleMinimize = () => {
   rootStore.minimize();
 };
+
+const handleTop = (payload: { isTop: boolean }) => {
+  rootStore.top(payload.isTop);
+}
 
 const handleQuit = () => {
   rootStore.quit();
