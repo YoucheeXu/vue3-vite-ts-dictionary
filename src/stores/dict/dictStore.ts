@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { requestDictsInfo, requestQueryWord, requestUploadFile } from "@/service/dict";
+import { requestDictsInfo, requestQueryWord, requestUploadFile, requestAddLevel } from "@/service/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
@@ -93,6 +93,10 @@ export const useDictStore = defineStore("dictState", () => {
     return requestUploadFile(uploadUrl, formData);
   }
 
+  async function addLevel(word: string, level: string) {
+    return requestAddLevel(word, level);
+  }
+
   return {
     dictState,
     getDictsInfo,
@@ -101,6 +105,7 @@ export const useDictStore = defineStore("dictState", () => {
     getNextWordAct,
     getPrevWordAct,
     uploadDict,
-    uploadAudio
+    uploadAudio,
+    addLevel
   };
 });

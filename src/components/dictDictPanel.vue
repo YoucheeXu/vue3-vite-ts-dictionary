@@ -216,6 +216,31 @@ const isDirectoryEntry = (entry: FileSystemEntry): entry is FileSystemDirectoryE
   return entry.isDirectory
 }
 
+const getFileNameWithoutExtensionRobust = (filePath: string): string => {
+  const pureFileName = filePath.split(/[\\/]/).pop() || '';
+  if (!pureFileName || pureFileName.lastIndexOf('.') === -1) return pureFileName;
+  if (pureFileName.startsWith('.') && pureFileName.indexOf('.', 1) === -1) return pureFileName;
+  return pureFileName.substring(0, pureFileName.lastIndexOf('.'));
+};
+
+// TXT line reading state (new)
+const rawTxtContent: Ref<string> = ref('')
+const txtLines: Ref<string[]> = ref([])
+const filterEmptyLines: Ref<boolean> = ref(true)
+const errorMsg: Ref<string> = ref('')
+
+const splitLines = (): void => {
+  if (!rawTxtContent.value) {
+    txtLines.value = []
+    return
+  }
+  let lines = rawTxtContent.value.split(/\r?\n|\r/) // Support all line breaks
+  if (filterEmptyLines.value) {
+    lines = lines.filter(line => line.trim() !== '')
+  }
+  txtLines.value = lines
+}
+
 async function dealWithFiles(filesList: FileItem[]) {
   for (const file of filesList) {
     const fileName = file.name
@@ -230,6 +255,22 @@ async function dealWithFiles(filesList: FileItem[]) {
       const msg = ret.msg;
       emit('statsUpdate', { msg });
     } else if (fileName.endsWith('.txt')) {
+      // Read TXT and split lines
+      const reader = new FileReader()
+      reader.onload = async (event) => {
+        rawTxtContent.value = event.target?.result as string
+        splitLines()
+        const level = getFileNameWithoutExtensionRobust(fileName);
+        console.debug(`level: ${level}`);
+        for (const word of txtLines.value) {
+          const ret = await dictStore.addLevel(word, level);
+          emit('statsUpdate', { msg: ret.msg });
+        }
+      }
+      reader.onerror = () => {
+        errorMsg.value = `Failed to read ${fileName}: ${reader.error?.message}`
+      }
+      reader.readAsText(file.file, 'UTF-8') // Use 'GBK' for Chinese garbled text
     } else {
       throw new Error(`Unsupported file type: ${fileName} (only .json/.mp3/.txt are allowed)`);
     }

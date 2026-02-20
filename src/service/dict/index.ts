@@ -39,3 +39,10 @@ export function requestUploadFile(uploadUrl: string, formData: FormData){
     }
   });
 }
+
+export function requestAddLevel(word: string, level: string) {
+  const patchUrl = `/words/${word}/add/level/${level}`;
+  return NetRequest.patch<IDataType>({
+    url: patchUrl,
+  });
+}
