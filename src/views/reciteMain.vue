@@ -3,6 +3,10 @@
         <div class="stats-card">
             <h2>今日学习统计</h2>
             <ul class="stats-list">
+                <li class="user-level-item" @click="handleItemClick" >
+                    <span class=" user-name">{{ currentUserRef }}</span>
+                    <span class="level-name">{{ currentLevelRef }}</span>
+                </li>
                 <li>All words: <span class="highlight">{{ stats.allWords }}</span></li>
                 <li>Need to learn Word: <span class="highlight">{{ stats.needLearn }}</span></li>
                 <li>New words to learn: <span class="highlight">{{ stats.newWords }}</span></li>
@@ -14,7 +18,10 @@
             {{ strtBtnTextRef }}
         </el-button>
 
-        <el-dialog v-model="dialogVisibleRef" :title="titleRef" width="500px" :close-on-click-modal="false"
+        <UserLevelDialog v-model:visible="usrLvlDlgVisibleRef" :user-list="userListRef" :level-list="levelListRef"
+            :user-level-map="userLevelMapRef" @confirm="handleUsrLvlDlgConfirm" @cancel="handleUsrLvlDlgCancel" />
+
+        <el-dialog v-model="reciteDlgVisibleRef" :title="reciteDlgTitleRef" width="500px" :close-on-click-modal="false"
             :close-on-press-escape="false" :modal="false" modal-penetrable>
             <StudyTestMode ref="studyTestModeRef" @change-title="handleChangeTitle" @update-stats="handleStatsUpdate"
                 @finish="handleReciteFinish" />
@@ -25,15 +32,27 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 import { useReciteStore } from "@/stores/recite/reciteStore";
-import StudyTestMode from '@/components/studyTestMode.vue'
+import type { User, Level, ConfirmResult, UserLevelMap } from "@/types/recite";
+import UserLevelDialog from '@/components/userLevelDialog.vue';
+import StudyTestMode from '@/components/studyTestMode.vue';
 
-const titleRef = ref("Unkown Mode");
-const dialogVisibleRef = ref(false)
+const currentUserRef = ref('');
+const currentLevelRef = ref('');
+
+const usrLvlDlgVisibleRef = ref(false)
+const userListRef = ref<User[]>([]);
+const levelListRef = ref<Level[]>([]);
+const userLevelMapRef = ref<UserLevelMap>({});
+
+const reciteDlgTitleRef = ref("Unkown Mode");
+const reciteDlgVisibleRef = ref(false)
 const isFinishedRef = ref(false)
 const strtBtnTextRef = ref('Start to Recite(␣)')
 
+const configStore = useConfigStore();
 const rootState = useRootStore();
 const reciteStore = useReciteStore();
 
@@ -46,10 +65,44 @@ const stats = reactive({
 
 const studyTestModeRef = ref<InstanceType<typeof StudyTestMode> | null>(null);
 
+const handleItemClick = () => {
+
+    userListRef.value = ([
+        { name: 'Alice', desc: 'Student' },
+        { name: 'Bob', desc: 'Teacher' }
+    ])
+
+    levelListRef.value = ([
+        { value: 'CET4', label: 'CET4' },
+        { value: 'CET6', label: 'CET6' },
+        { value: 'TOEFL', label: 'TOEFL' },
+        { value: 'IELTS', label: 'IELTS' }
+    ])
+
+    userLevelMapRef.value = ({
+        Alice: ['CET4', 'CET4+CET6'],
+        Bob: ['IELTS-CET6']
+    })
+
+    usrLvlDlgVisibleRef.value = true;
+}
+
+const handleUsrLvlDlgConfirm = (caseType: number, ...rest: any[]) => {
+    const [, , newMap, newUser] = rest
+    userLevelMapRef.value = newMap
+    if (newUser) userListRef.value.push(newUser)
+    console.log('Confirmed Case:', caseType)
+}
+
+// Handle dialog cancel
+const handleUsrLvlDlgCancel = () => {
+    console.log('Dialog canceled')
+}
+
 const start2Recite = async () => {
     // reciteStore.reciteState
 
-    dialogVisibleRef.value = true
+    reciteDlgVisibleRef.value = true
 
     nextTick(async () => {
         if (studyTestModeRef.value) {
@@ -65,7 +118,7 @@ const start2Recite = async () => {
 }
 
 const handleChangeTitle = (payload: { title: string }) => {
-    titleRef.value = payload.title;
+    reciteDlgTitleRef.value = payload.title;
 }
 
 const handleStatsUpdate = (payload: { recited: number; needLearn: number }) => {
@@ -75,7 +128,7 @@ const handleStatsUpdate = (payload: { recited: number; needLearn: number }) => {
 }
 
 const handleReciteFinish = () => {
-    dialogVisibleRef.value = false
+    reciteDlgVisibleRef.value = false
     isFinishedRef.value = true
     strtBtnTextRef.value = "You have finished the today's target. Press Esc to quit!"
 }
@@ -114,12 +167,28 @@ onMounted(async () => {
     stats.newWords = newCount;
     stats.needLearn = inProgressCount;
     stats.recited = fnshdCount;
+
+    currentUserRef.value = configStore.config.ReciteWords.User;
+    currentLevelRef.value = configStore.config.ReciteWords.Target;
 })
 
 onUnmounted(() => window.removeEventListener('keydown', handleKeyDown))
 </script>
 
 <style scoped>
+.user-level-map-display {
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    max-width: 500px;
+}
+
+pre {
+    margin: 0;
+    font-size: 12px;
+    white-space: pre-wrap;
+}
+
 .start-container {
     min-height: 100vh;
     display: flex;
@@ -156,6 +225,41 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeyDown))
     color: #606266;
     display: flex;
     justify-content: space-between;
+}
+
+/* Key: Use flex to align left/right, ensure the li has enough width */
+.user-level-item {
+    display: flex;
+    /* Enable flex layout */
+    justify-content: space-between;
+    /* Left for first child, right for last child */
+    align-items: center;
+    /* Vertically center the text (optional) */
+    width: 100%;
+    /* Ensure the li takes full width (critical for alignment) */
+    padding: 8px 12px;
+    /* Optional: Add padding for better spacing */
+    list-style: none;
+    /* Optional: Remove default li bullet point */
+    border-bottom: 1px solid #eee;
+    /* Optional: Add separator line */
+}
+
+/* Optional: Customize text style */
+.user-name {
+    text-align: left;
+    padding-left: 60px;
+    /* Explicit left align (redundant for flex, but safe) */
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.level-name {
+    text-align: right;
+    padding-right: 60px;
+    /* Explicit right align (redundant for flex, but safe) */
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .highlight {
