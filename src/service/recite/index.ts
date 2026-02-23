@@ -6,6 +6,24 @@ export interface IRetType<T = any> {
     msg: string;
 }
 
+export function requestListLevels() {
+    return NetRquest.get<IRetType>({
+        url: `/recite/list/levels`,
+    });
+}
+
+export function requestListUsers() {
+    return NetRquest.get<IRetType>({
+        url: `/recite/list/users`,
+    });
+}
+
+export function requestGetUserLevelMap() {
+    return NetRquest.get<IRetType>({
+        url: `/recite/get/userlevelmap`,
+    });
+}
+
 export function requestStart2Recite() {
     return NetRquest.get<IRetType>({
         url: `/recite/start2recite/`,

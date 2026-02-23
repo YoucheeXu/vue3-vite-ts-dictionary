@@ -3,7 +3,7 @@
         <div class="stats-card">
             <h2>今日学习统计</h2>
             <ul class="stats-list">
-                <li class="user-level-item" @click="handleItemClick" >
+                <li class="user-level-item" @click="handleItemClick">
                     <span class=" user-name">{{ currentUserRef }}</span>
                     <span class="level-name">{{ currentLevelRef }}</span>
                 </li>
@@ -65,24 +65,13 @@ const stats = reactive({
 
 const studyTestModeRef = ref<InstanceType<typeof StudyTestMode> | null>(null);
 
-const handleItemClick = () => {
+const handleItemClick = async () => {
 
-    userListRef.value = ([
-        { name: 'Alice', desc: 'Student' },
-        { name: 'Bob', desc: 'Teacher' }
-    ])
+    userListRef.value = await reciteStore.listUsers();
 
-    levelListRef.value = ([
-        { value: 'CET4', label: 'CET4' },
-        { value: 'CET6', label: 'CET6' },
-        { value: 'TOEFL', label: 'TOEFL' },
-        { value: 'IELTS', label: 'IELTS' }
-    ])
+    levelListRef.value = await reciteStore.listLevels();
 
-    userLevelMapRef.value = ({
-        Alice: ['CET4', 'CET4+CET6'],
-        Bob: ['IELTS-CET6']
-    })
+    userLevelMapRef.value = await reciteStore.getUserLevelMap();
 
     usrLvlDlgVisibleRef.value = true;
 }

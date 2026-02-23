@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
 import {
+    requestListLevels,
+    requestListUsers,
+    requestGetUserLevelMap,
     requestStart2Recite,
     requestGoStudyMode,
     requestStudyNext,
@@ -15,6 +18,7 @@ import type { ICountDetail} from "./types";
 import type { IRetGoStudyMode, IRetStudyNext} from "./types";
 import type { IRetGoTestMode, IRetTestNext} from "./types";
 import type { IRetCheckInput, IRetActWord} from "./types";
+import type { User, Level, UserLevelMap } from "@/types/recite";
 
 export const useReciteStore = defineStore("reciteState", () => {
     const reciteState: IReciteState = {
@@ -27,6 +31,35 @@ export const useReciteStore = defineStore("reciteState", () => {
         num2Learn: 0,
         num2Test: 0
     };
+
+    async function listLevels(): Promise<Level []>{
+        const result = await requestListLevels();
+        const levelValues = result.data as string [];
+
+        const levelList: Level [] = [];
+        for (const levelValue of levelValues) {
+            levelList.push({value: levelValue, label: levelValue});
+        }
+
+        return levelList;
+    }
+
+    async function listUsers(): Promise<User []>{
+        const result = await requestListUsers();
+        const usernames = result.data as string [];
+
+        const userList: User [] = [];
+        for (const username of usernames) {
+            userList.push({name: username, desc: username});
+        }
+        return userList;
+    }
+
+    async function getUserLevelMap(): Promise<UserLevelMap>{
+        const result = await requestGetUserLevelMap();
+        const levels = result.data as UserLevelMap;
+        return levels;
+    }
 
     async function start2Recite(): Promise<
         [number, number, number, number]
@@ -178,6 +211,9 @@ export const useReciteStore = defineStore("reciteState", () => {
     }
 
     return {
+        listLevels,
+        listUsers,
+        getUserLevelMap,
         reciteState,
         start2Recite,
         goStudyMode,
