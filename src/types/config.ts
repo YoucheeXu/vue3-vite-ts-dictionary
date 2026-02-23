@@ -52,8 +52,8 @@ export interface DictionaryConfig {
 /** ReciteWords module configuration */
 export interface ReciteWordsConfig {
   GUI: ReciteWordsGUIConfig; // Use base interface
-  User: string;
-  Target: string;
+  LastUser: string;
+  LastTarget: string;
   DictId: number;
   AudioId: number;
 }
@@ -101,8 +101,8 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
       Height: 551,
       Width: 701,
     },
-    User: "anonymous",
-    Target: "IELTS",
+    LastUser: "anonymous",
+    LastTarget: "IELTS",
     DictId: 1,
     AudioId: 1,
   },

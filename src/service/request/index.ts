@@ -110,6 +110,10 @@ class CNetRequest {
     post<T = any>(config: NetRequestConfig): Promise<T> {
         return this.request<T>({ ...config, method: 'POST' });
     }
+    
+    put<T = any>(config: NetRequestConfig): Promise<T> {
+        return this.request<T>({ ...config, method: 'PUT' });
+    }
 
     delete<T = any>(config: NetRequestConfig): Promise<T> {
         return this.request<T>({ ...config, method: 'DELETE' });

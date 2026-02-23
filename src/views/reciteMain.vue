@@ -144,21 +144,16 @@ onMounted(async () => {
     }
 
     await rootState.fullscreen();
-    // reciteStore.start2Recite()
-    //     .then(([allCount, newCount, fnshdCount, inProgressCount]: [number, number, number, number]) => {
-    //         stats.allWords = allCount;
-    //         stats.newWords = newCount;
-    //         stats.needLearn = inProgressCount;
-    //         stats.recited = fnshdCount;
-    //     });
+
+    currentUserRef.value = configStore.config.ReciteWords.LastUser;
+    currentLevelRef.value = configStore.config.ReciteWords.LastTarget;
+
+    await reciteStore.selectUserLevel(currentUserRef.value, currentLevelRef.value);
     const [allCount, newCount, fnshdCount, inProgressCount]: [number, number, number, number] = await reciteStore.start2Recite();
     stats.allWords = allCount;
     stats.newWords = newCount;
     stats.needLearn = inProgressCount;
     stats.recited = fnshdCount;
-
-    currentUserRef.value = configStore.config.ReciteWords.User;
-    currentLevelRef.value = configStore.config.ReciteWords.Target;
 })
 
 onUnmounted(() => window.removeEventListener('keydown', handleKeyDown))

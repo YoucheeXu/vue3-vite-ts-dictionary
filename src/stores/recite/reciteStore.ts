@@ -3,6 +3,7 @@ import {
     requestListLevels,
     requestListUsers,
     requestGetUserLevelMap,
+    requestSelectUserLevel,
     requestStart2Recite,
     requestGoStudyMode,
     requestStudyNext,
@@ -59,6 +60,10 @@ export const useReciteStore = defineStore("reciteState", () => {
         const result = await requestGetUserLevelMap();
         const levels = result.data as UserLevelMap;
         return levels;
+    }
+
+    async function selectUserLevel(user: string, level: string): Promise<void>{
+        await requestSelectUserLevel(user, level);
     }
 
     async function start2Recite(): Promise<
@@ -214,6 +219,7 @@ export const useReciteStore = defineStore("reciteState", () => {
         listLevels,
         listUsers,
         getUserLevelMap,
+        selectUserLevel,
         reciteState,
         start2Recite,
         goStudyMode,
