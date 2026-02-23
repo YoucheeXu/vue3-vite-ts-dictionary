@@ -18,6 +18,28 @@ export interface ICountDetail {
     num2Test: number;
 }
 
+// Existing user type
+export interface IUser {
+  name: string; // Unique identifier
+  desc: string;
+}
+
+// Existing level type
+export interface ILevel {
+  value: string;
+  label: string;
+}
+
+// Confirm result type (emitted by dialog)
+export interface IConfirmResult {
+  type: 'user' | 'level';
+  isNew: boolean;
+  value: string;
+}
+
+// 1:N Mapping: Key = unique username, Value = array of levels
+export type TUserLevelMap = Record<string, string[]>;
+
 export const enum ActEnum {
     NOACT,
     STUDY_MODE,

@@ -19,7 +19,7 @@ import type { ICountDetail} from "./types";
 import type { IRetGoStudyMode, IRetStudyNext} from "./types";
 import type { IRetGoTestMode, IRetTestNext} from "./types";
 import type { IRetCheckInput, IRetActWord} from "./types";
-import type { User, Level, UserLevelMap } from "@/types/recite";
+import type { IUser, ILevel, TUserLevelMap } from "./types";
 
 export const useReciteStore = defineStore("reciteState", () => {
     const reciteState: IReciteState = {
@@ -33,11 +33,11 @@ export const useReciteStore = defineStore("reciteState", () => {
         num2Test: 0
     };
 
-    async function listLevels(): Promise<Level []>{
+    async function listLevels(): Promise<ILevel []>{
         const result = await requestListLevels();
-        const valueMap = result.data as UserLevelMap;
+        const valueMap = result.data as TUserLevelMap;
 
-        const levelList: Level [] = [];
+        const levelList: ILevel [] = [];
         for (const levelValue of valueMap['levels']) {
             levelList.push({value: levelValue, label: levelValue});
         }
@@ -45,20 +45,20 @@ export const useReciteStore = defineStore("reciteState", () => {
         return levelList;
     }
 
-    async function listUsers(): Promise<User []>{
+    async function listUsers(): Promise<IUser []>{
         const result = await requestListUsers();
-        const valueMap = result.data as UserLevelMap;
+        const valueMap = result.data as TUserLevelMap;
 
-        const userList: User [] = [];
+        const userList: IUser [] = [];
         for (const username of valueMap['users']) {
             userList.push({name: username, desc: username});
         }
         return userList;
     }
 
-    async function getUserLevelMap(): Promise<UserLevelMap>{
+    async function getUserLevelMap(): Promise<TUserLevelMap>{
         const result = await requestGetUserLevelMap();
-        const levels = result.data as UserLevelMap;
+        const levels = result.data as TUserLevelMap;
         return levels;
     }
 

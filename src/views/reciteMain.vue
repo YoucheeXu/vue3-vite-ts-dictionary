@@ -35,7 +35,7 @@ import { ElMessage } from 'element-plus'
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 import { useReciteStore } from "@/stores/recite/reciteStore";
-import type { User, Level, ConfirmResult, UserLevelMap } from "@/types/recite";
+import type { IUser, ILevel, IConfirmResult, TUserLevelMap } from "@/stores/recite/types";
 import UserLevelDialog from '@/components/userLevelDialog.vue';
 import StudyTestMode from '@/components/studyTestMode.vue';
 
@@ -43,9 +43,9 @@ const currentUserRef = ref('');
 const currentLevelRef = ref('');
 
 const usrLvlDlgVisibleRef = ref(false)
-const userListRef = ref<User[]>([]);
-const levelListRef = ref<Level[]>([]);
-const userLevelMapRef = ref<UserLevelMap>({});
+const userListRef = ref<IUser[]>([]);
+const levelListRef = ref<ILevel[]>([]);
+const userLevelMapRef = ref<TUserLevelMap>({});
 
 const reciteDlgTitleRef = ref("Unkown Mode");
 const reciteDlgVisibleRef = ref(false)

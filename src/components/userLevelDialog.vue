@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, type Ref } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import type { User, Level, ConfirmResult, UserLevelMap } from "@/types/recite";
+import type { IUser, ILevel, IConfirmResult, TUserLevelMap } from "@/stores/recite/types";
 
 // ------------------------------
 // Props & Emits
@@ -86,18 +86,18 @@ const props = defineProps({
     },
     // Existing user list (passed from parent)
     userList: {
-        type: Array as () => User[],
+        type: Array as () => IUser[],
         required: true,
         default: () => []
     },
     // Existing level list (passed from parent)
     levelList: {
-        type: Array as () => Level[],
+        type: Array as () => ILevel[],
         required: true,
         default: () => []
     },
     userLevelMap: {
-        type: Object as () => UserLevelMap, // Use imported UserLevelMap type
+        type: Object as () => TUserLevelMap, // Use imported UserLevelMap type
         required: true,
         default: () => ({})
     }
@@ -106,7 +106,7 @@ const props = defineProps({
 // Emits: confirm (return selected/new user & level), cancel
 const emit = defineEmits<{
     (e: 'update:visible', value: boolean): void;
-    (e: 'confirm', caseType: 1 | 2 | 3, userRes: ConfirmResult, levelRes: ConfirmResult, newMap: UserLevelMap, newUser?: User): void;
+    (e: 'confirm', caseType: 1 | 2 | 3, userRes: IConfirmResult, levelRes: IConfirmResult, newMap: TUserLevelMap, newUser?: IUser): void;
     (e: 'cancel'): void;
 }>()
 
@@ -324,8 +324,8 @@ const handleConfirm = async () => {
         else throw new Error('Forbidden combination')
 
         // Step 3: Assemble user data
-        let userResult: ConfirmResult
-        let newUser: User | undefined = undefined
+        let userResult: IConfirmResult
+        let newUser: IUser | undefined = undefined
         const targetUserName = isSelectNewUser.value
             ? formData.newUserName.trim()
             : formData.selectedUserKey
@@ -350,7 +350,7 @@ const handleConfirm = async () => {
         }
 
         // Step 4: Assemble level data
-        let levelResult: ConfirmResult
+        let levelResult: IConfirmResult
         const targetLevel = isSelectNewUser.value || isSelectNewLevel.value
             ? formData.newLevel.trim()
             : formData.selectedLevelKey
@@ -362,7 +362,7 @@ const handleConfirm = async () => {
         }
 
         // Step 5: Update 1:N user-level map (dedup)
-        const updatedUserLevelMap: UserLevelMap = { ...props.userLevelMap }
+        const updatedUserLevelMap: TUserLevelMap = { ...props.userLevelMap }
         const existingLevels = props.userLevelMap[targetUserName] || []
         updatedUserLevelMap[targetUserName] = [...new Set([...existingLevels, targetLevel])]
 
