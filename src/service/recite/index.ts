@@ -39,6 +39,21 @@ export function requestSelectUserLevel(user: string, level: string){
     });
 }
 
+export function requestNewUserLevel(user: string, level: string){
+    return NetRquest.put<IRetType>({
+        url: `/recite/new`,
+        data: {
+            'user': user,
+            'level': level
+        },
+        headers: {
+            'Content-Type': 'application/json', // Ensure JSON format (may be default in NetRquest)
+            // If your NetRquest adds auth headers by default, disable for login:
+            // 'No-Auth': 'true' 
+        }
+    });
+}
+
 export function requestStart2Recite() {
     return NetRquest.get<IRetType>({
         url: `/recite/start2recite/`,
