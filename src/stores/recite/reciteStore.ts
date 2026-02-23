@@ -35,10 +35,10 @@ export const useReciteStore = defineStore("reciteState", () => {
 
     async function listLevels(): Promise<Level []>{
         const result = await requestListLevels();
-        const levelValues = result.data as string [];
+        const valueMap = result.data as UserLevelMap;
 
         const levelList: Level [] = [];
-        for (const levelValue of levelValues) {
+        for (const levelValue of valueMap['levels']) {
             levelList.push({value: levelValue, label: levelValue});
         }
 
@@ -47,10 +47,10 @@ export const useReciteStore = defineStore("reciteState", () => {
 
     async function listUsers(): Promise<User []>{
         const result = await requestListUsers();
-        const usernames = result.data as string [];
+        const valueMap = result.data as UserLevelMap;
 
         const userList: User [] = [];
-        for (const username of usernames) {
+        for (const username of valueMap['users']) {
             userList.push({name: username, desc: username});
         }
         return userList;
