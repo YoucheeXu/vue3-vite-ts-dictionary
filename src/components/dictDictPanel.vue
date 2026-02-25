@@ -299,15 +299,13 @@ const handleDrop = async (e: DragEvent) => {
     if (entry) {
       if (isFileEntry(entry)) {
         await readFileEntry(entry);
-        // console.debug(fileList.value);
-        await dealWithFiles(fileList.value);
       } else if (isDirectoryEntry(entry)) {
         await readDirectoryEntry(entry, entry.name);
-        // console.debug(fileList.value);
-        await dealWithFiles(fileList.value);
       }
     }
   }
+  // console.debug(fileList.value);
+  await dealWithFiles(fileList.value);
 }
 
 // Parse single file entry
