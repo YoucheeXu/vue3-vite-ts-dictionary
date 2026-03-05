@@ -3,19 +3,10 @@
     <!-- <button type="button" id="btn_prev" disabled="disabled"></button> -->
     <imgButton4 id="btn_prev" img="./skin/prev_btn.bmp" :width="45" :height="37" @btn-cliked="handleBtnCliked" />
     <!-- <button type="button" id="btn_next" disabled="disabled"></button> -->
-    <imgButton4
-      id="btn_next"
-      disabled="disabled"
-      img="./skin/next_btn.bmp"
-      :width="40"
-      :height="37"
-      @btn-cliked="handleBtnCliked"
-    />
-    <form
-      @submit.prevent="handleQueryWord"
-      class="input_box"
-      style="width: 600px; height: 37px; background: url(./skin/combox_bk.bmp)"
-    >
+    <imgButton4 id="btn_next" disabled="disabled" img="./skin/next_btn.bmp" :width="40" :height="37"
+      @btn-cliked="handleBtnCliked" />
+    <form @submit.prevent="handleQueryWord" class="input_box"
+      style="width: 600px; height: 37px; background: url(./skin/combox_bk.bmp)">
       <!-- <input
         id="word_input"
         v-model="word"
@@ -23,23 +14,14 @@
         autofocus="true"
         style="width: 466px; height: 37px; border: 0px; background-color: transparent"
       /> -->
-      <el-input
-        v-model="word"
-        ref="inputRef"
-        style="width: 466px; height: 37px; border: 0px"
-        placeholder="Input word"
-      />
+      <el-input v-model="word" ref="inputRef" style="width: 466px; height: 37px; border: 0px"
+        placeholder="Input word" />
       <!-- @keyup.enter.native="handleEnter" placeholder="Input word" /> -->
       <!-- <button type="button" id="btn_del" style="border: none;"></button> -->
       <imgButton3 id="btn_del" img="./skin/delete_item.bmp" :width="30" :height="34" @btn-cliked="handleBtnCliked" />
       <!-- <button type="button" id="btn_drop" style="border: none;"></button> -->
-      <imgButton3
-        id="btn_drop"
-        img="./skin/combobox_drop_btn.bmp"
-        :width="20"
-        :height="34"
-        @btn-cliked="handleBtnCliked"
-      />
+      <imgButton3 id="btn_drop" img="./skin/combobox_drop_btn.bmp" :width="20" :height="34"
+        @btn-cliked="handleBtnCliked" />
       <!-- <button type="button" id="btn_lookup" style="border: none;"></button> -->
       <imgButton3 type="submit" id="btn_lookup" img="./skin/lookup_btn.bmp" :width="110" :height="37" />
     </form>
@@ -48,8 +30,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import imgButton3 from "./imgButton3.vue";
-import imgButton4 from "./imgButton4.vue";
+import imgButton3 from "@/base-ui/imgButton3.vue";
+import imgButton4 from "@/base-ui/imgButton4.vue";
 // import { useRootStore } from '@/stores/root';
 
 // const rootStore = useRootStore();

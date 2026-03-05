@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import imgButton3 from "./imgButton3.vue";
+import imgButton3 from "@/base-ui/imgButton3.vue";
 
 const emit = defineEmits(["quit", "minimize"]);
 
