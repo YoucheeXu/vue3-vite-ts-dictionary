@@ -208,12 +208,12 @@ const fileList: Ref<FileItem[]> = ref([])
 
 // Type guard: Check if entry is FileSystemFileEntry
 const isFileEntry = (entry: FileSystemEntry): entry is FileSystemFileEntry => {
-  return entry.isFile
+  return entry && entry.isFile === true;
 }
 
 // Type guard: Check if entry is FileSystemDirectoryEntry
 const isDirectoryEntry = (entry: FileSystemEntry): entry is FileSystemDirectoryEntry => {
-  return entry.isDirectory
+  return entry && entry.isDirectory === true;
 }
 
 const getFileNameWithoutExtensionRobust = (filePath: string): string => {
@@ -282,6 +282,8 @@ async function dealWithFiles(filesList: FileItem[]) {
  * @param e DragEvent - Native drop event
  */
 const handleDrop = async (e: DragEvent) => {
+  if (!e.dataTransfer) return;
+
   e.preventDefault()
   e.stopPropagation()
   isDragging.value = false
@@ -290,21 +292,40 @@ const handleDrop = async (e: DragEvent) => {
   fileList.value = []
 
   // Get drag data (DataTransfer object)
-  const items = e.dataTransfer?.items as DataTransferItem[] | undefined;
-  if (!items || items.length === 0) return;
+  // const items = e.dataTransfer?.items as DataTransferItem[] | undefined;
+  // if (!items || items.length === 0) return;
+  const items = e.dataTransfer.items;
+  const files = e.dataTransfer.files;
+
+  console.debug(`total ${items.length} drag item.`);
 
   // Parse each dragged item
   for (const item of items) {
     const entry = item.webkitGetAsEntry();
-    if (entry) {
-      if (isFileEntry(entry)) {
-        await readFileEntry(entry);
-      } else if (isDirectoryEntry(entry)) {
-        await readDirectoryEntry(entry, entry.name);
+    try {
+      if (entry) {
+        if (isFileEntry(entry)) {
+          // await readFileEntry(entry);
+        } else if (isDirectoryEntry(entry)) {
+          await readDirectoryEntry(entry, entry.name);
+        }
       }
+    } catch (error) {
+      console.error(`Failed to process entry:`, error);
     }
   }
-  // console.debug(fileList.value);
+
+  for (const file of files) {
+    fileList.value.push({
+      type: 'file',
+      name: file.name,
+      size: file.size,
+      fullPath: `/${file.name}`, // Fallback path (adjust if needed)
+      file: file
+    });
+  }
+
+  console.debug(fileList.value);
   await dealWithFiles(fileList.value);
 }
 
@@ -324,8 +345,13 @@ const readFileEntry = (fileEntry: FileSystemFileEntry): Promise<void> => {
         fullPath: fileEntry.fullPath,
         file: file
       })
-      resolve()
-    })
+      resolve();
+    },
+      (error) => {
+        console.error(`Failed to read file entry "${fileEntry.name}":`, error);
+        resolve(); // Resolve even on error (prevents loop from hanging)
+      }
+    )
   })
 }
 
