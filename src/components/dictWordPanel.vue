@@ -4,13 +4,7 @@
     <div class="text">
       {{ props.word }}
     </div>
-    <div id="Player" class="sound">
-      <button id="playpause" ref="btnPlayPauseRef" class="jp-play" @click="handleClickAudio" />
-      <audio id="wordAudio" ref="audioWordRef" autoplay @play="handlePlay" @ended="handleEnded">
-        <source :src="props.audioURL" type="audio/mpeg" />
-        Your browser does not support the audio tag.
-      </audio>
-    </div>
+    <JPlayer ref="childJPlayerRef" :audio-u-r-l="props.audioURL" />
     <div class="newMmark">NEW</div>
     <div class="level">
       {{ props.level }}
@@ -27,6 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import JPlayer from "@/base-ui/jPlayer.vue";
 
 const props = defineProps<{
   word: string;
@@ -36,76 +31,11 @@ const props = defineProps<{
   nStars: number;
 }>();
 
-const btnPlayPauseRef = ref<HTMLButtonElement>();
-const audioWordRef = ref<HTMLAudioElement>();
-
-/* function updatePlayBtnSt(playing: boolean) {
-  const btnPlayPause = btnPlayPauseRef.value;
-  if (playing) {
-    btnPlayPause?.classList.add('jp-state-playing');
-  } else {
-    btnPlayPause?.classList.remove('jp-state-playing');
-  }
-}
-const audioElemnt = audioWordRef.value;
-audioElemnt?.addEventListener("play", (event) => {
-  // var btn = event?.currentTarget?.previousSibling?.previousSibling as HTMLButtonElement;
-  // console.log(btnPlayPause);
-  console.log(event);
-  updatePlayBtnSt(true);
-});
-audioElemnt?.addEventListener("playing", (event) => {
-  // var btn = event?.currentTarget as HTMLButtonElement;
-  // var btn = event?.currentTarget?.previousSibling?.previousSibling as HTMLButtonElement;
-  // console.log(btn);
-  console.log(event);
-  updatePlayBtnSt(true);
-});
-audioElemnt?.addEventListener("ended", (event) => {
-  // var btn = event?.currentTarget as HTMLButtonElement;
-  // var btn = event?.currentTarget?.previousSibling?.previousSibling as HTMLButtonElement;
-  // console.log(btn);
-  console.log(event);
-  updatePlayBtnSt(false);
-}); */
-
-const handlePlay = () => {
-  const btnPlayPause = btnPlayPauseRef.value;
-  btnPlayPause?.classList.add("jp-state-playing");
-};
-
-const handleEnded = () => {
-  const btnPlayPause = btnPlayPauseRef.value;
-  btnPlayPause?.classList.remove("jp-state-playing");
-};
+const childJPlayerRef = ref<InstanceType<typeof JPlayer> | null>(null);
 
 const play = () => {
-  const audioElemnt = audioWordRef.value;
-  console.log("Play: ", audioElemnt);
-  if (audioElemnt) {
-    /* if (audioElemnt.paused || audioElemnt.ended) {
-      audioElemnt.play();
-      console.log("word: allow to play!");
-      // updatePlayBtnSt(false);
-    } else {
-      audioElemnt.pause();
-      console.log("word: not allow to play!");
-      // updatePlayBtnSt(true);
-    } */
-    audioElemnt.pause();
-    audioElemnt.currentTime = 0;
-    // audioElemnt.src = props.audioURL;
-    audioElemnt.load();
-    audioElemnt.play().catch((error) => {
-      console.error("Error to play: ", error);
-      console.error("url: ", props.audioURL);
-      console.error("src: ", audioElemnt.src);
-    });
-  }
-};
-
-const handleClickAudio = () => {
-  play();
+  const childJPlayer = childJPlayerRef.value;
+  childJPlayer?.play();
 };
 
 defineExpose({
@@ -145,38 +75,7 @@ defineExpose({
     display: inline;*/
 }
 
-.sound button {
-  /* display:inline-block; */
-  /* display: inline; */
-  /* float:left; */
-  /* overflow:hidden; */
-  /* text-indent:-9999px; */
-  border: none;
-  cursor: pointer;
-}
-
-.jp-play {
-  width: 40px;
-  height: 40px;
-  /* background: url(./assets/images/jplayer.blue.monday.png) no-repeat; */
-  /* 关键修改：./ → /，根路径引用public/assets下的资源 */
-  background: url(/assets/images/jplayer.blue.monday.png) no-repeat;
-}
-
-.jp-play:focus {
-  background: url(/assets/images/jplayer.blue.monday.png) -41px 0 no-repeat;
-}
-
-.jp-state-playing.jp-play {
-  background: url(/assets/images/jplayer.blue.monday.png) 0 -42px no-repeat;
-}
-
-.jp-state-playing.jp-play:focus {
-  background: url(/assets/images/jplayer.blue.monday.png) -41px -42px no-repeat;
-}
-
 .text,
-.sound,
 .phonetic {
   display: inline-block;
   display: inline;
