@@ -1,5 +1,8 @@
 <template>
-  <div class="title_panel titlebar">
+  <div class="title_panel titlebar"
+    @mousedown="handleMouseDown" @mouseup="handleMouseUp"
+    @mouseleave="handleMouseUp"
+  >
     <el-dropdown id="menu_dropdown" @command="handleDropdownCommand" ref="dropdownRef" trigger="click">
       <!-- <button class="btn" type="button" id="btn_menu" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false"></button> -->
@@ -29,15 +32,70 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import imgButton3 from "@/base-ui/imgButton3.vue";
+import { throttle } from '@/utilities/utilities';
 
-const emit = defineEmits(["quit", "minimize"]);
+const emit = defineEmits<{
+  "moveWindow": [payload: {deltaX : number, deltaY : number}],
+  "quit": [];
+  "minimize": [];
+}>();
+
+// Reference to the title bar DOM element
+let isDragging = ref(false);
+let initialMouseX = ref(0); // Initial mouse position (on mousedown)
+let initialMouseY = ref(0);
 
 const router = useRouter()
 // Ref for dropdown (to manually control show/hide if needed)
 const dropdownRef = ref(null)
+
+const handleMouseDown = (e: MouseEvent) => {
+  if (e.button !== 0) return; // Only left-click
+  isDragging.value = true;
+
+  // Init mouse position (screen coordinates = no mismatch)
+  initialMouseX.value = e.screenX;
+  initialMouseY.value = e.screenY;
+
+  // Add global listeners (only when dragging)
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('mouseup', handleMouseUp);
+  window.addEventListener('mouseleave', handleMouseUp);
+
+  e.preventDefault();
+};
+
+const handleMouseMove = throttle((e: MouseEvent) => {
+  if (!isDragging.value) return;
+
+  // Calculate mouse offset from initial position
+  const deltaX = e.screenX - initialMouseX.value;
+  const deltaY = e.screenY - initialMouseY.value;
+
+  // Emit absolute position (1 call per throttle interval → no delay)
+  emit('moveWindow', { deltaX, deltaY });
+
+  initialMouseX.value = e.screenX;
+  initialMouseY.value = e.screenY;
+}, 16); // 16ms = ~60fps (smooth, no overload)
+
+const handleMouseUp = (e: MouseEvent) => {
+  if (!isDragging.value) return;
+  isDragging.value = false;
+  window.removeEventListener('mousemove', handleMouseMove);
+  window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('mouseleave', handleMouseUp);
+};
+
+// Clean up listener when component unmounts
+onUnmounted(() => {
+  window.removeEventListener('mousemove', handleMouseMove);
+  window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('mouseleave', handleMouseUp);
+});
 
 const handleBtnCliked = (id: string) => {
   console.log(id + " was clicked!");

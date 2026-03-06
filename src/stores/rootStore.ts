@@ -1,4 +1,4 @@
-// import { reactive, computed } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useConfigStore } from "@/stores/configStore";
 
@@ -38,6 +38,10 @@ export const useRootStore = defineStore("rootState", () => {
             }, timeout)
         })
     }
+
+  async function moveWindow(deltaX: number, deltaY: number): Promise<void> {
+      window.pywebview.api.invoke("moveWindow", deltaX, deltaY);
+  }
 
   async function minimize(): Promise<void> {
     // window.ipc.invoke("app", "minimize");
@@ -83,6 +87,7 @@ export const useRootStore = defineStore("rootState", () => {
     return {
         rootState,
         waitForPyWebview,
+        moveWindow,
         minimize,
         resize,
         top,

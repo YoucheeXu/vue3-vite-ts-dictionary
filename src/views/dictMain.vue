@@ -1,6 +1,6 @@
 <template>
   <div class="app-wrapper">
-    <titlebar @quit="handleQuit" @minimize="handleMinimize" />
+    <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" />
     <inputPanel ref="childInputRef" @query-word="handleQueryWord" @query-next="handleQueryNext"
       @query-prev="handleQueryPrev" />
     <wordPanel ref="childWordRef" :word="wordRef" :audio-u-r-l="audioURLRef" :b-new="bNewRef" :level="levelRef"
@@ -32,6 +32,10 @@ const configStore = useConfigStore();
 const rootStore = useRootStore();
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
+
+const handleMoveWindow = (payload: { deltaX: number, deltaY: number }) => {
+  rootStore.moveWindow(payload.deltaX, payload.deltaY);
+}
 
 const handleMinimize = () => {
   rootStore.minimize();
