@@ -30,7 +30,7 @@ export function requestQueryWord(word: string, dictId: number) {
 
 export function requestQueryWordLike(dictId: number, wordLike: string, limit: number) {
   // const url = `/dicts/${dictId}/${wordLike}/limit/${limit}`;
-  const url = `/dicts/${dictId}/${wordLike}`;
+  const url = `/dicts/${dictId}/${wordLike}/`;
   console.debug(`request ${url}`);
   return NetRequest.get<IDataType>({
       url: url,
@@ -50,7 +50,7 @@ export function requestUploadFile(uploadUrl: string, formData: FormData){
 }
 
 export function requestAddLevel(word: string, level: string) {
-  const patchUrl = `/words/${word}/add/level/${level}`;
+  const patchUrl = `/words/${word}/add/level/${level}/`;
   return NetRequest.patch<IDataType>({
     url: patchUrl,
   });

@@ -8,25 +8,25 @@ export interface IRetType<T = any> {
 
 export function requestListLevels() {
     return NetRquest.get<IRetType>({
-        url: `/recite/list/levels`,
+        url: `/recite/list/levels/`,
     });
 }
 
 export function requestListUsers() {
     return NetRquest.get<IRetType>({
-        url: `/recite/list/users`,
+        url: `/recite/list/users/`,
     });
 }
 
 export function requestGetUserLevelMap() {
     return NetRquest.get<IRetType>({
-        url: `/recite/get/userlevelmap`,
+        url: `/recite/get/userlevelmap/`,
     });
 }
 
 export function requestSelectUserLevel(user: string, level: string){
     return NetRquest.put<IRetType>({
-        url: `/recite/select`,
+        url: `/recite/select/`,
         data: {
             'user': user,
             'level': level
@@ -41,7 +41,7 @@ export function requestSelectUserLevel(user: string, level: string){
 
 export function requestNewUserLevel(user: string, level: string){
     return NetRquest.put<IRetType>({
-        url: `/recite/new`,
+        url: `/recite/new/`,
         data: {
             'user': user,
             'level': level
