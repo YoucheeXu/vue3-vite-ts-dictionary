@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 // import path from "path";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 import { fileURLToPath, URL } from "node:url";
 import { getValidatedAppConfig } from "./src/config/nodeConfigUtils";
 
@@ -10,7 +13,31 @@ const serverConfig = appConfig.Server;
 
 export default defineConfig({
     base: "./", // Relative public path to adapt to HTTP server loading
-    plugins: [vue()],
+    plugins: [
+        vue(),
+        // Auto-import Element Plus APIs (e.g., ElMessage, ElMessageBox)
+        AutoImport({
+            resolvers: [ElementPlusResolver()],
+            // Auto-import Vue core APIs (optional but recommended)
+            imports: ["vue"],
+            // Generate type declarations (critical for TypeScript)
+            dts: "src/auto-imports.d.ts",
+        }),
+        // Auto-import Element Plus components (e.g., ElButton, ElTable)
+        Components({
+            resolvers: [
+                // Auto-import and register Element Plus components
+                ElementPlusResolver({
+                    // Optional: use Element Plus's theme-chalk (default)
+                    importStyle: "css",
+                    // If using custom theme (SCSS), set importStyle: 'scss'
+                    // importStyle: 'scss'
+                }),
+            ],
+            // Generate type declarations for components
+            dts: "src/types/components.d.ts",
+        }),
+    ],
     // Development environment configuration (optional, kept for compatibility)
     server: {
         // host: true, // Bind to 0.0.0.0 (listen on all network interfaces)
@@ -42,14 +69,14 @@ export default defineConfig({
 
                         // Log core info: Frontend request URL → Proxy forwarded URL
                         console.log(
-                            "\n==================== Proxy Forward Log ===================="
+                            "\n==================== Proxy Forward Log ====================",
                         );
                         console.log(
-                            `Frontend Request URL: http://localhost:5173${req.url}`
+                            `Frontend Request URL: http://localhost:5173${req.url}`,
                         );
                         console.log(`Proxy Forwarded URL: ${fullForwardUrl}`);
                         console.log(
-                            "=====================================================\n"
+                            "=====================================================\n",
                         );
                     });
 
@@ -60,7 +87,7 @@ export default defineConfig({
                             proxyRes.headers["Content-Type"] = "audio/mpeg";
                         }
                         console.log(
-                            `[Proxy Response] Backend Status Code: ${proxyRes.statusCode}`
+                            `[Proxy Response] Backend Status Code: ${proxyRes.statusCode}`,
                         );
                     });
                 },
