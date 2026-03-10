@@ -21,6 +21,7 @@ import type { IRetGoStudyMode, IRetStudyNext} from "./types";
 import type { IRetGoTestMode, IRetTestNext} from "./types";
 import type { IRetCheckInput, IRetActWord} from "./types";
 import type { IUser, ILevel, TUserLevelMap } from "./types";
+import { useRootStore } from "@/stores/rootStore";
 
 export const useReciteStore = defineStore("reciteState", () => {
     const reciteState: IReciteState = {
@@ -33,6 +34,8 @@ export const useReciteStore = defineStore("reciteState", () => {
         num2Learn: 0,
         num2Test: 0
     };
+
+    const rootState = useRootStore();
 
     async function listLevels(): Promise<ILevel []>{
         const result = await requestListLevels();
@@ -101,7 +104,8 @@ export const useReciteStore = defineStore("reciteState", () => {
     }
 
     function buildURL(url: string){
-        const baseURL = import.meta.env.VITE_BASE_URL;
+        const baseURL = rootState.rootState.baseURL;
+        console.debug(`baseURL = ${baseURL}`);
         return `${baseURL}/${url}`;
     }
 
