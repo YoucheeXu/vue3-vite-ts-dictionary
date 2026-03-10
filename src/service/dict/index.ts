@@ -28,6 +28,15 @@ export function requestQueryWord(word: string, dictId: number) {
   });
 }
 
+export function requestQueryWordLike(dictId: number, wordLike: string, limit: number) {
+  // const url = `/dicts/${dictId}/${wordLike}/limit/${limit}`;
+  const url = `/dicts/${dictId}/${wordLike}`;
+  console.debug(`request ${url}`);
+  return NetRequest.get<IDataType>({
+      url: url,
+  });
+}
+
 export function requestUploadFile(uploadUrl: string, formData: FormData){
   return NetRequest.post<IDataType>({
     url: uploadUrl,

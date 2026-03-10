@@ -1,5 +1,11 @@
 import { defineStore } from "pinia";
-import { requestDictsInfo, requestQueryWord, requestUploadFile, requestAddLevel } from "@/service/dict";
+import {
+    requestDictsInfo,
+    requestQueryWord,
+    requestQueryWordLike,
+    requestUploadFile,
+    requestAddLevel,
+} from "@/service/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
@@ -79,6 +85,16 @@ export const useDictStore = defineStore("dictState", () => {
     return word;
   }
 
+  async function query_wordlike(
+      dictId: number,
+      wordLike: string,
+      limit: number,
+  ): Promise<Record<string, string>> {
+    const result = await requestQueryWordLike(dictId, wordLike, limit);
+    const word_dict = result.data as Record<string, string>;
+    return word_dict;
+  }
+
   async function uploadDict(dictId: number, file: File){
     const uploadUrl = `/dicts/${dictId}/upload/${file.name}`;
     const formData = new FormData();
@@ -104,6 +120,7 @@ export const useDictStore = defineStore("dictState", () => {
     queryWord,
     getNextWordAct,
     getPrevWordAct,
+    query_wordlike,
     uploadDict,
     uploadAudio,
     addLevel

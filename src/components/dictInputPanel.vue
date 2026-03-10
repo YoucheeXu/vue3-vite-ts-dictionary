@@ -1,53 +1,139 @@
 <template>
   <div class="input_panel">
-    <!-- <button type="button" id="btn_prev" disabled="disabled"></button> -->
     <imgButton4 id="btn_prev" img="./skin/prev_btn.bmp" :width="45" :height="37" @btn-cliked="handleBtnCliked" />
-    <!-- <button type="button" id="btn_next" disabled="disabled"></button> -->
     <imgButton4 id="btn_next" disabled="disabled" img="./skin/next_btn.bmp" :width="40" :height="37"
       @btn-cliked="handleBtnCliked" />
-    <form @submit.prevent="handleQueryWord" class="input_box"
-      style="width: 600px; height: 37px; background: url(./skin/combox_bk.bmp)">
-      <!-- <input
-        id="word_input"
-        v-model="word"
-        type="text"
-        autofocus="true"
-        style="width: 466px; height: 37px; border: 0px; background-color: transparent"
-      /> -->
-      <el-input v-model="word" ref="inputRef" style="width: 466px; height: 37px; border: 0px"
-        placeholder="Input word" />
-      <!-- @keyup.enter.native="handleEnter" placeholder="Input word" /> -->
-      <!-- <button type="button" id="btn_del" style="border: none;"></button> -->
+    <div class="input_box" style="width: 600px; height: 37px; background: url(./skin/combox_bk.bmp)">
+      <el-autocomplete v-model="word" ref="autoCompleteRef" :fetch-suggestions="handleFetchSuggestions"
+        @select="handleSelectItem" @keyup.enter.prevent="handleEnterKey" placeholder="Input word to search"
+        style="width: 466px; height: 37px; border: 0px" :loading="isLoading" :debounce="300"
+        popper-class="custom-autocomplete-dropdown">
+        <template #default="{ item }">
+          <div>
+            <span>{{ item.key }}</span>
+            <span style="margin-left: 10px">{{ item.value }}</span>
+          </div>
+        </template>
+      </el-autocomplete>
       <imgButton3 id="btn_del" img="./skin/delete_item.bmp" :width="30" :height="34" @btn-cliked="handleBtnCliked" />
-      <!-- <button type="button" id="btn_drop" style="border: none;"></button> -->
       <imgButton3 id="btn_drop" img="./skin/combobox_drop_btn.bmp" :width="20" :height="34"
         @btn-cliked="handleBtnCliked" />
-      <!-- <button type="button" id="btn_lookup" style="border: none;"></button> -->
-      <imgButton3 type="submit" id="btn_lookup" img="./skin/lookup_btn.bmp" :width="110" :height="37" />
-    </form>
+      <imgButton3 id="btn_lookup" img="./skin/lookup_btn.bmp" :width="110" :height="37" @btn-cliked="handleBtnCliked" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
+import { nextTick } from "vue";
 import imgButton3 from "@/base-ui/imgButton3.vue";
 import imgButton4 from "@/base-ui/imgButton4.vue";
-// import { useRootStore } from '@/stores/root';
 
-// const rootStore = useRootStore();
-// const rootState = rootStore.rootState;
+const props = defineProps<{
+  words_dict?: Record<string, string>;
+}>();
+
+const emit = defineEmits<{
+  "queryWord": [],
+  "queryWordLike": [playload: { dictId: number, wordLike: string, limit: number }]
+  "queryPrev": [],
+  "queryNext": [],
+}>();
 
 // const word = defineModel();
 const word = ref("");
-const inputRef = ref();
+const autoCompleteRef = ref<InstanceType<typeof import('element-plus')['ElAutocomplete']>>();
+const isLoading = ref(false);
+// Store the latest callback for refreshing suggestions
+const latestSuggestionCallback = ref<((results: any[]) => void) | null>(null);
 
-const emit = defineEmits(["queryWord", "queryPrev", "queryNext"]);
+// Convert Record to Array (dropdown needs array, not object)
+const dropdownOptions = computed(() => {
+  if (!props.words_dict) return [];
+  // Convert Record to array: { key: string, value: string }[]
+  return Object.entries(props.words_dict).map(([key, value]) => ({ key, value }));
+});
+
+// Handle input change & emit query to parent
+const handleFetchSuggestions = (query: string, callback: (results: any[]) => void) => {
+  // Save the callback for later refresh
+  latestSuggestionCallback.value = callback;
+
+  // Only emit if input is not empty (adjust as needed)
+  if (query.trim()) {
+    isLoading.value = true;
+    emit('queryWordLike', {
+      dictId: 0,
+      wordLike: `${query}*`, // Add * as required
+      limit: 10
+    });
+    callback([]);
+  } else {
+    // If input is empty, clear dropdown
+    callback([]);
+    isLoading.value = false;
+  }
+};
+
+const focusAndSelectInput = async () => {
+  await nextTick(); // Wait for DOM to update (after dropdown closes)
+  if (!autoCompleteRef.value || !autoCompleteRef.value.inputRef) return;
+
+  // Get the underlying input DOM element
+  const inputElement = autoCompleteRef.value.inputRef;
+
+  inputElement.focus(); // Regain focus
+  inputElement.select(); // Select all text in input
+
+  // closeDropdown();
+};
+
+const closeDropdown = async () => {
+  if (latestSuggestionCallback.value) {
+    latestSuggestionCallback.value([]); // No suggestions = dropdown closes
+  }
+
+  if (autoCompleteRef.value) {
+    autoCompleteRef.value.blur();
+  }
+
+  isLoading.value = false;
+
+  if (autoCompleteRef.value?.popperRef) {
+    autoCompleteRef.value.popperRef.hide(); // Official hide method
+  }
+};
+
+// Update dropdown when props.words_dict changes (watch props)
+watch(
+  () => props.words_dict,
+  () => {
+    isLoading.value = false;
+    // Trigger autocomplete to refresh suggestions with new data
+    // Only refresh if we have a valid callback and input is not empty
+    if (latestSuggestionCallback.value && word.value.trim()) {
+      // Pass updated dropdown options to the autocomplete
+      latestSuggestionCallback.value(dropdownOptions.value);
+    }
+  },
+  { immediate: true, deep: true } // Run on initial mount, deep: watch Record key/value changes
+);
+
+// Handle dropdown item selection
+const handleSelectItem = (item: Record<string, any>) => {
+  word.value = item.key;
+};
+
+// Handle Enter key press (Core Feature)
+const handleEnterKey = () => {
+  handleQueryWord();
+};
 
 const handleBtnCliked = (id: string) => {
-  // console.log(id + " was clicked!");
+  console.debug(id + " was clicked!");
   switch (id) {
     case "btn_del":
-      inputRef.value.clear();
+      word.value = "";
       break;
     case "btn_prev":
       emit("queryPrev");
@@ -63,14 +149,16 @@ const handleBtnCliked = (id: string) => {
   }
 };
 
-const handleQueryWord = () => {
+const handleQueryWord = async () => {
   emit("queryWord");
-  inputRef.value.select();
+  await closeDropdown();
+  await focusAndSelectInput();
 };
 
 defineExpose({
   word,
 });
+
 </script>
 
 <style scoped>
@@ -97,10 +185,6 @@ defineExpose({
   top: 10px;
 }
 
-/* #btn_prev:disabled{ */
-/* background-position-x: -135px; */
-/* } */
-
 #btn_next {
   outline: none;
   border: none;
@@ -109,10 +193,6 @@ defineExpose({
   top: 10px;
 }
 
-/* #btn_next:disabled{ */
-/* background-position-x: -120px; */
-/* } */
-
 .input_box {
   position: absolute;
   top: 10px;
@@ -120,13 +200,6 @@ defineExpose({
   width: 486px;
   height: 32px;
 }
-
-/* input:focus { */
-/* border: 0px; */
-/* outline: none; */
-/* background-color:transparent; */
-/* border-style:none; */
-/* } */
 
 #btn_del {
   position: absolute;

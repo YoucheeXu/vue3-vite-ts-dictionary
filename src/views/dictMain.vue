@@ -1,7 +1,7 @@
 <template>
   <div class="app-wrapper">
     <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" />
-    <inputPanel ref="childInputRef" @query-word="handleQueryWord" @query-next="handleQueryNext"
+    <inputPanel ref="childInputRef" :words_dict="wordsDict" @query-word="handleQueryWord" @query-word-like="handleQueryWordLike" @query-next="handleQueryNext"
       @query-prev="handleQueryPrev" />
     <wordPanel ref="childWordRef" :word="wordRef" :audio-u-r-l="audioURLRef" :b-new="bNewRef" :level="levelRef"
       :n-stars="nStarsRef" />
@@ -32,6 +32,8 @@ const configStore = useConfigStore();
 const rootStore = useRootStore();
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
+
+const wordsDict = ref<Record<string, string>>({});
 
 const handleMoveWindow = (payload: { deltaX: number, deltaY: number }) => {
   rootStore.moveWindow(payload.deltaX, payload.deltaY);
@@ -109,6 +111,11 @@ const handleQueryWord = async () => {
     queryWord(word);
   }
 };
+
+const handleQueryWordLike = async (playload: { dictId: number, wordLike: string, limit: number }) => {
+  wordsDict.value = await dictStore.query_wordlike(playload.dictId, playload.wordLike, playload.limit);
+  // console.debug(`wordsDict = ${wordsDict.value}`);
+}
 
 // TODO: status of button
 const handleQueryNext = async () => {
