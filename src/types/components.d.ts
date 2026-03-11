@@ -33,7 +33,5 @@ declare module 'vue' {
     ReciteUserLevelDialog: typeof import('./../components/reciteUserLevelDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    StudyTestMode: typeof import('./../components/reciteUserLevelDialog.vuedefault']
-    UserLevelDialog: typeof import('./../components/userLevelDialog.vue')['default']
   }
 }
