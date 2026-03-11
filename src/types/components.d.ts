@@ -30,9 +30,10 @@ declare module 'vue' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ReciteReciteDialog: typeof import('./../components/reciteReciteDialog.vue')['default']
+    ReciteUserLevelDialog: typeof import('./../components/reciteUserLevelDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    StudyTestMode: typeof import('./../components/studyTestMode.vue')['default']
+    StudyTestMode: typeof import('./../components/reciteUserLevelDialog.vuedefault']
     UserLevelDialog: typeof import('./../components/userLevelDialog.vue')['default']
   }
 }

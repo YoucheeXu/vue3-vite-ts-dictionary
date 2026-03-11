@@ -18,7 +18,7 @@
             {{ strtBtnTextRef }}
         </el-button>
 
-        <UserLevelDialog v-model:visible="usrLvlDlgVisibleRef" :user-list="userListRef" :level-list="levelListRef"
+        <reciteUserLevelDialog v-model:visible="usrLvlDlgVisibleRef" :user-list="userListRef" :level-list="levelListRef"
             :user-level-map="userLevelMapRef" @confirm="handleUsrLvlDlgConfirm" @cancel="handleUsrLvlDlgCancel" />
 
         <reciteReciteDialog ref="reciteDialogRef" v-model:visible="reciteDlgVisibleRef"
@@ -33,7 +33,7 @@ import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 import { useReciteStore } from "@/stores/recite/reciteStore";
 import type { IUser, ILevel, IConfirmResult, TUserLevelMap } from "@/stores/recite/types";
-import UserLevelDialog from '@/components/userLevelDialog.vue';
+import reciteUserLevelDialog from '@/components/reciteUserLevelDialog.vue';
 import reciteReciteDialog from '@/components/reciteReciteDialog.vue';
 
 const currentUserRef = ref('');
