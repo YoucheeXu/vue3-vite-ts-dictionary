@@ -1,12 +1,9 @@
 <template>
-    <el-dialog :model-value="visible" :title="titleRef" width="500px" :close-on-click-modal="false"
-        :close-on-press-escape="false" :modal="false" modal-penetrable>
-        <div class="study-container">
-            <!-- Header with word display input -->
-            <div class="header">
-                <el-input v-model="inputWordRef" class="word-input" :disabled="disaWordInputRef" />
-            </div>
-
+    <el-dialog :model-value="visible" :title="titleRef" width="741px" :close-on-click-modal="false"
+        :close-on-press-escape="false" :modal="false" modal-penetrable center>
+        <!-- Header with word display input -->
+        <div class="header">
+            <el-input v-model="inputWordRef" class="word-input" :disabled="disaWordInputRef" />
             <div class="audio">
                 <div class="phonetic">
                     {{ phoneticRef }}
@@ -15,42 +12,42 @@
                     <jPlayer ref="childJPlayerRef" :audio-u-r-l="audioURLRef" />
                 </div>
             </div>
+        </div>
 
-            <!-- Word details card (iframe for HTML content) -->
-            <div class="word-card">
-                <!-- <iframe ref="wordIframe" class="word-html-container" :srcdoc="currentWordHtml" frameborder="0" -->
-                <iframe ref="wordIframe" class="word-html-container" :src="dictURLRef" frameborder="0"
-                    scrolling="no"></iframe>
+        <!-- Word details card (iframe for HTML content) -->
+        <div class="word-card">
+            <iframe ref="wordIframeRef" class="word-html-container" :src="dictURLRef"
+                style="position: relative; width: 701px; height: 314px" frameborder="0" marginwidth="0" marginheight="0"
+                allowtransparency="true" />
+        </div>
+
+        <!-- Action area -->
+        <div class="action">
+            <!-- Buttons -->
+            <div class="button-group">
+                <el-button @click="handleReadAgain" type="primary" plain>Again(F5)</el-button>
+                <el-button :disabled="disaForgetBtnRef" @click="handleForget" type="warning"
+                    plain>Forgotten(F6)</el-button>
+                <el-button @click="handleMaster" type="success" plain>Chop(F7)</el-button>
             </div>
-
-            <!-- Action area -->
-            <div class="action">
-                <!-- Buttons -->
-                <div class="button-group">
-                    <el-button @click="handleReadAgain" type="primary" plain>Again(F5)</el-button>
-                    <el-button :disabled="disaForgetBtnRef" @click="handleForget" type="warning"
-                        plain>Forgotten(F6)</el-button>
-                    <el-button @click="handleMaster" type="success" plain>Chop(F7)</el-button>
-                </div>
-                <div class="cur-count">
-                    {{ curCountRef }}
-                </div>
-                <!-- Operation tip -->
-                <div class="operation-tip"
-                    :class="[{ 'forgotten': tipTypeRef === 'forgotten' }, { 'chopped': tipTypeRef === 'chopped' }]">
-                    {{ tipTextRef }}
-                </div>
+            <div class="cur-count">
+                {{ curCountRef }}
             </div>
+            <!-- Operation tip -->
+            <div class="operation-tip"
+                :class="[{ 'forgotten': tipTypeRef === 'forgotten' }, { 'chopped': tipTypeRef === 'chopped' }]">
+                {{ tipTextRef }}
+            </div>
+        </div>
 
-            <!-- Footer stats section -->
-            <div class="footer">
-                <div class="stats-row">
-                    <span>{{ num2LearnRef }} words to Learn</span>
-                    <span>
-                        {{ idxOfCurRef }} of {{ numOfTotalRef }}
-                    </span>
-                    <span>{{ num2TestRef }} words to Test</span>
-                </div>
+        <!-- Footer stats section -->
+        <div class="footer">
+            <div class="stats-row">
+                <span>{{ num2LearnRef }} words to Learn</span>
+                <span>
+                    {{ idxOfCurRef }} of {{ numOfTotalRef }}
+                </span>
+                <span>{{ num2TestRef }} words to Test</span>
             </div>
         </div>
     </el-dialog>
@@ -288,41 +285,18 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Main container styling */
-.study-container {
-    width: 480px;
-    height: 360px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    margin: 0 auto;
-}
-
-/* Header (word display input) */
 .header {
     background: #f3f4f6;
     padding: 8px 12px;
     border-bottom: 1px solid #e5e7eb;
     display: flex;
+    flex-direction: column;
     align-items: center;
     flex-shrink: 0;
-    height: 40px;
+    height: 70px;
+    row-gap: 4px;
 }
 
-/* Word card (contains iframe for dynamic content) */
-.word-card {
-    flex: 1;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    overflow-y: auto;
-}
-
-/* Disabled input for word display (centered) */
 .word-input {
     width: 200px;
     margin: 0 auto;
@@ -331,13 +305,16 @@ defineExpose({
     font-weight: 500;
 }
 
+.audio {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+}
+
 .phonetic {
-    /* margin:0px 0px 20px 10px; */
     margin: 0px 0px 0px 5px;
-    /*margin-top:-25px;*/
     vertical-align: middle;
-    /*display: inline-block;
-    display: inline;*/
 }
 
 .phonetic,
@@ -346,51 +323,47 @@ defineExpose({
     display: inline;
 }
 
-/* IFrame container (integrates word definition + examples) */
+.word-card {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
 .word-html-container {
     width: 100%;
-    min-height: 150px;
+    min-height: 314px;
     border: none;
     flex: 1;
 }
 
-/* CORE FIX: Action area with fixed height + relative positioning */
 .action {
-    /* Fixed height to prevent button movement (matches button group height) */
+    margin-top: 16px;
     height: 60px;
-    /* Relative container for absolute tip positioning */
-    position: relative;
     display: flex;
+    flex-direction: column;
+    row-gap: 4px;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    border-top: 1px solid #e5e7eb;
 }
 
-/* Button group (stationary, fixed position) */
 .button-group {
     display: flex;
     justify-content: space-around;
     padding: 8px 12px;
     width: 100%;
-    /* Buttons never move - fixed space */
     margin: 0;
 }
 
-/* CORE FIX: Operation tip (absolute overlay, no layout shift) */
 .operation-tip {
-    /* Absolute position: overlays buttons, no space occupation */
-    position: absolute;
-    top: 45px;
-    left: 0;
-    right: 0;
     text-align: center;
     font-weight: 500;
     font-size: 14px;
     line-height: 1.2;
 }
 
-/* Tip color variants */
 .operation-tip.forgotten {
     color: #e64340;
 }
@@ -399,8 +372,8 @@ defineExpose({
     color: #52c41a;
 }
 
-/* Footer (stats section with gray background) */
 .footer {
+    margin-top: 8px;
     background: #f3f4f6;
     padding: 4px 12px;
     border-top: 1px solid #e5e7eb;
