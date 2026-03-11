@@ -21,7 +21,7 @@ export default defineConfig({
             // Auto-import Vue core APIs (optional but recommended)
             imports: ["vue"],
             // Generate type declarations (critical for TypeScript)
-            dts: "src/auto-imports.d.ts",
+            dts: "src/types/auto-imports.d.ts",
         }),
         // Auto-import Element Plus components (e.g., ElButton, ElTable)
         Components({
