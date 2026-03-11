@@ -68,13 +68,14 @@ const props = defineProps({
     }
 })
 
-const reciteStore = useReciteStore();
-const titleRef = ref("");
-
 // Define custom events for parent component communication
 const emit = defineEmits<{
     'finish': []
 }>()
+
+const reciteStore = useReciteStore();
+
+const titleRef = ref("");
 
 // input area state
 const inputWordRef = ref("");
@@ -135,7 +136,7 @@ function studyNext() {
 
         tipTextRef.value = score;
 
-        idxOfCurRef.value = curLearnIndex + 1;
+        idxOfCurRef.value = curLearnIndex;
         numOfTotalRef.value = num2Learn;
 
         play();
@@ -171,11 +172,14 @@ function goTestMode() {
 function dealWithRet(action: ActEnum, curCount: number = 0, testTimes: number = 0, num2Test: number = 0) {
     switch (action) {
         case ActEnum.STUDY_MODE:
-            goStudyMode()
+            goStudyMode();
+            break;
         case ActEnum.STUDY_NEXT:
-            studyNext()
+            studyNext();
+            break;
         case ActEnum.TEST_MODE:
-            goTestMode()
+            goTestMode();
+            break;
         case ActEnum.TEST_NEXT:
             curCountRef.value = `Count: ${curCount} of ${testTimes}`;
             numOfTotalRef.value = testTimes;
@@ -183,9 +187,11 @@ function dealWithRet(action: ActEnum, curCount: number = 0, testTimes: number = 
             num2TestRef.value = num2Test;
             reciteStore.reciteState.num2Test = num2Test;
             inputWordRef.value = ""
-            testNext()
+            testNext();
+            break;
         case ActEnum.FINISH:
             emit('finish');
+            break;
     }
 }
 
@@ -206,9 +212,11 @@ function checkInput() {
                 inputWordRef.value = word;
                 num2LearnRef.value = num2Learn;
                 reciteStore.reciteState.num2Learn = num2Learn;
+                break;
             case "Wrong!":  // Test fail, try again
                 num2LearnRef.value = num2Learn;
                 reciteStore.reciteState.num2Learn = num2Learn;
+                break;
         }
         tipTextRef.value = score;
         dealWithRet(action, curCount, testTimes, num2Test);
@@ -220,10 +228,7 @@ const play = () => {
     childJPlayer?.play();
 };
 
-// Button handler functions
 const handleReadAgain = () => {
-    // console.log(`Re-reading word: ${currentWord.value.word}`)
-    // ElMessage.info(`Re-reading: ${currentWord.value.word}`)
     tipTextRef.value = ''
     tipTypeRef.value = ''
 
@@ -263,10 +268,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
             break
         case 'Enter':
             checkInput();
-            // tipTextRef.value = ''
-            // tipTypeRef.value = ''
-            // nextWord()
-            // ElMessage.info(`Next word: ${currentWord.value.word}`)
             break
         default:
             break

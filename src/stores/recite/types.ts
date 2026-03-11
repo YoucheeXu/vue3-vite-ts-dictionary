@@ -41,6 +41,7 @@ export interface IConfirmResult {
 export type TUserLevelMap = Record<string, string[]>;
 
 export const enum ActEnum {
+    ALIGN,
     NOACT,
     STUDY_MODE,
     STUDY_NEXT,
