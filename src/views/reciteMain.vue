@@ -21,11 +21,8 @@
         <UserLevelDialog v-model:visible="usrLvlDlgVisibleRef" :user-list="userListRef" :level-list="levelListRef"
             :user-level-map="userLevelMapRef" @confirm="handleUsrLvlDlgConfirm" @cancel="handleUsrLvlDlgCancel" />
 
-        <el-dialog v-model="reciteDlgVisibleRef" :title="reciteDlgTitleRef" width="500px" :close-on-click-modal="false"
-            :close-on-press-escape="false" :modal="false" modal-penetrable>
-            <StudyTestMode ref="studyTestModeRef" @change-title="handleChangeTitle" @update-stats="handleStatsUpdate"
-                @finish="handleReciteFinish" />
-        </el-dialog>
+        <reciteReciteDialog ref="reciteDialogRef" v-model:visible="reciteDlgVisibleRef"
+            @update-stats="handleStatsUpdate" @finish="handleReciteFinish" />
     </div>
 </template>
 
@@ -37,7 +34,7 @@ import { useRootStore } from "@/stores/rootStore";
 import { useReciteStore } from "@/stores/recite/reciteStore";
 import type { IUser, ILevel, IConfirmResult, TUserLevelMap } from "@/stores/recite/types";
 import UserLevelDialog from '@/components/userLevelDialog.vue';
-import StudyTestMode from '@/components/studyTestMode.vue';
+import reciteReciteDialog from '@/components/reciteReciteDialog.vue';
 
 const currentUserRef = ref('');
 const currentLevelRef = ref('');
@@ -47,7 +44,6 @@ const userListRef = ref<IUser[]>([]);
 const levelListRef = ref<ILevel[]>([]);
 const userLevelMapRef = ref<TUserLevelMap>({});
 
-const reciteDlgTitleRef = ref("Unkown Mode");
 const reciteDlgVisibleRef = ref(false)
 const isFinishedRef = ref(false)
 const strtBtnTextRef = ref('Start to Recite(␣)')
@@ -63,7 +59,7 @@ const stats = reactive({
     recited: 0
 })
 
-const studyTestModeRef = ref<InstanceType<typeof StudyTestMode> | null>(null);
+const reciteDialogRef = ref<InstanceType<typeof reciteReciteDialog> | null>(null);
 
 const handleItemClick = async () => {
 
@@ -89,25 +85,19 @@ const handleUsrLvlDlgCancel = () => {
 }
 
 const start2Recite = async () => {
-    // reciteStore.reciteState
-
     reciteDlgVisibleRef.value = true
 
     nextTick(async () => {
-        if (studyTestModeRef.value) {
+        if (reciteDialogRef.value) {
             if (reciteStore.reciteState.num2Learn > 0) {
-                studyTestModeRef.value?.goStudyMode();
+                reciteDialogRef.value.goStudyMode();
             } else {
-                studyTestModeRef.value?.goTestMode();
+                reciteDialogRef.value.goTestMode();
             }
         } else {
             console.error("component StudyTestMode is not ready!")
         }
     })
-}
-
-const handleChangeTitle = (payload: { title: string }) => {
-    reciteDlgTitleRef.value = payload.title;
 }
 
 const handleStatsUpdate = (payload: { recited: number; needLearn: number }) => {

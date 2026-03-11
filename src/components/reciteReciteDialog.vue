@@ -1,65 +1,67 @@
 <template>
-    <div class="study-container">
-        <!-- Header with word display input -->
-        <div class="header">
-            <el-input v-model="inputWordRef" class="word-input" :disabled="disaWordInputRef" />
-        </div>
+    <el-dialog :model-value="visible" :title="titleRef" width="500px" :close-on-click-modal="false"
+        :close-on-press-escape="false" :modal="false" modal-penetrable>
+        <div class="study-container">
+            <!-- Header with word display input -->
+            <div class="header">
+                <el-input v-model="inputWordRef" class="word-input" :disabled="disaWordInputRef" />
+            </div>
 
-        <div class="audio">
-            <div class="phonetic">
-                {{ phoneticRef }}
+            <div class="audio">
+                <div class="phonetic">
+                    {{ phoneticRef }}
+                </div>
+                <div id="Player" class="sound">
+                    <button id="playpause" ref="btnPlayPauseRef" class="jp-play" @click="handleClickAudio" />
+                    <audio id="wordAudio" ref="audioWordRef" autoplay @play="handlePlay" @ended="handleEnded">
+                        <source :src="audioURLRef" type="audio/mpeg" />
+                        Your browser does not support the audio tag.
+                    </audio>
+                </div>
             </div>
-            <div id="Player" class="sound">
-                <button id="playpause" ref="btnPlayPauseRef" class="jp-play" @click="handleClickAudio" />
-                <audio id="wordAudio" ref="audioWordRef" autoplay @play="handlePlay" @ended="handleEnded">
-                    <source :src="audioURLRef" type="audio/mpeg" />
-                    Your browser does not support the audio tag.
-                </audio>
-            </div>
-        </div>
 
-        <!-- Word details card (iframe for HTML content) -->
-        <div class="word-card">
-            <!-- <iframe ref="wordIframe" class="word-html-container" :srcdoc="currentWordHtml" frameborder="0" -->
-            <iframe ref="wordIframe" class="word-html-container" :src="dictURLRef" frameborder="0"
-                scrolling="no"></iframe>
-        </div>
+            <!-- Word details card (iframe for HTML content) -->
+            <div class="word-card">
+                <!-- <iframe ref="wordIframe" class="word-html-container" :srcdoc="currentWordHtml" frameborder="0" -->
+                <iframe ref="wordIframe" class="word-html-container" :src="dictURLRef" frameborder="0"
+                    scrolling="no"></iframe>
+            </div>
 
-        <!-- Action area -->
-        <div class="action">
-            <!-- Buttons -->
-            <div class="button-group">
-                <el-button @click="handleReadAgain" type="primary" plain>Again(F5)</el-button>
-                <el-button :disabled="disaForgetBtnRef" @click="handleForget" type="warning"
-                    plain>Forgotten(F6)</el-button>
-                <el-button @click="handleMaster" type="success" plain>Chop(F7)</el-button>
+            <!-- Action area -->
+            <div class="action">
+                <!-- Buttons -->
+                <div class="button-group">
+                    <el-button @click="handleReadAgain" type="primary" plain>Again(F5)</el-button>
+                    <el-button :disabled="disaForgetBtnRef" @click="handleForget" type="warning"
+                        plain>Forgotten(F6)</el-button>
+                    <el-button @click="handleMaster" type="success" plain>Chop(F7)</el-button>
+                </div>
+                <div class="cur-count">
+                    {{ curCountRef }}
+                </div>
+                <!-- Operation tip -->
+                <div class="operation-tip"
+                    :class="[{ 'forgotten': tipTypeRef === 'forgotten' }, { 'chopped': tipTypeRef === 'chopped' }]">
+                    {{ tipTextRef }}
+                </div>
             </div>
-            <div class="cur-count">
-                {{ curCountRef }}
-            </div>
-            <!-- Operation tip -->
-            <div class="operation-tip"
-                :class="[{ 'forgotten': tipTypeRef === 'forgotten' }, { 'chopped': tipTypeRef === 'chopped' }]">
-                {{ tipTextRef }}
-            </div>
-        </div>
 
-        <!-- Footer stats section -->
-        <div class="footer">
-            <div class="stats-row">
-                <span>{{ num2LearnRef }} words to Learn</span>
-                <span>
-                    {{ idxOfCurRef }} of {{ numOfTotalRef }}
-                </span>
-                <span>{{ num2TestRef }} words to Test</span>
+            <!-- Footer stats section -->
+            <div class="footer">
+                <div class="stats-row">
+                    <span>{{ num2LearnRef }} words to Learn</span>
+                    <span>
+                        {{ idxOfCurRef }} of {{ numOfTotalRef }}
+                    </span>
+                    <span>{{ num2TestRef }} words to Test</span>
+                </div>
             </div>
         </div>
-    </div>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { ActEnum } from '@/stores/recite/types';
 import { useReciteStore } from "@/stores/recite/reciteStore";
 // import { fa } from 'element-plus/es/locale';
@@ -72,11 +74,20 @@ import { useReciteStore } from "@/stores/recite/reciteStore";
 //     dictURL: string
 // }
 
+const props = defineProps({
+    // Control dialog visibility (two-way binding)
+    visible: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
+})
+
 const reciteStore = useReciteStore();
+const titleRef = ref("");
 
 // Define custom events for parent component communication
 const emit = defineEmits<{
-    'change-title': [payload: { title: string }]
     'finish': []
 }>()
 
@@ -115,7 +126,7 @@ const numOfTotalRef = ref(0)
 const num2TestRef = ref(0);
 
 function changeTitle(title: string) {
-    emit('change-title', { title });
+    titleRef.value = title;
 }
 
 function goStudyMode() {
