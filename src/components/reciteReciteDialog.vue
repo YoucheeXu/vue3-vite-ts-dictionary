@@ -11,12 +11,8 @@
                 <div class="phonetic">
                     {{ phoneticRef }}
                 </div>
-                <div id="Player" class="sound">
-                    <button id="playpause" ref="btnPlayPauseRef" class="jp-play" @click="handleClickAudio" />
-                    <audio id="wordAudio" ref="audioWordRef" autoplay @play="handlePlay" @ended="handleEnded">
-                        <source :src="audioURLRef" type="audio/mpeg" />
-                        Your browser does not support the audio tag.
-                    </audio>
+                <div class="sound">
+                    <jPlayer ref="childJPlayerRef" :audio-u-r-l="audioURLRef" />
                 </div>
             </div>
 
@@ -64,15 +60,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { ActEnum } from '@/stores/recite/types';
 import { useReciteStore } from "@/stores/recite/reciteStore";
-// import { fa } from 'element-plus/es/locale';
-
-// Word type definition
-// interface Word {
-//     word: string
-//     phonetic: string
-//     audioURL: string
-//     dictURL: string
-// }
+import jPlayer from "@/base-ui/jPlayer.vue";
 
 const props = defineProps({
     // Control dialog visibility (two-way binding)
@@ -91,23 +79,13 @@ const emit = defineEmits<{
     'finish': []
 }>()
 
-// State management
-// const currentWord = computed(() => wordList[currentIndex.value])
-// const curWordRef = ref<Word>({
-//     word: "",
-//     phonetic: "",
-//     audioURL: "",
-//     dictURL: ""
-// });
-
 // input area state
 const inputWordRef = ref("");
 const disaWordInputRef = ref(true);
 
 //
-const btnPlayPauseRef = ref<HTMLButtonElement>();
-const audioWordRef = ref<HTMLAudioElement>();
 const phoneticRef = ref("");
+const childJPlayerRef = ref<InstanceType<typeof jPlayer> | null>(null);
 const audioURLRef = ref("");
 
 const dictURLRef = ref("");
@@ -166,11 +144,6 @@ function studyNext() {
         play();
     });
 }
-
-// function clearContent() {
-//     inputWordRef.value = "";
-//     dictURLRef.value = "";
-// }
 
 function testNext() {
     reciteStore.testNext().then(([audio1URL, dict2URL, curTestPos, curTestNum]: [string, string, number, number]) => {
@@ -245,43 +218,9 @@ function checkInput() {
     })
 }
 
-const handleClickAudio = () => {
-    play();
-};
-
-const handlePlay = () => {
-    const btnPlayPause = btnPlayPauseRef.value;
-    btnPlayPause?.classList.add("jp-state-playing");
-};
-
-const handleEnded = () => {
-    const btnPlayPause = btnPlayPauseRef.value;
-    btnPlayPause?.classList.remove("jp-state-playing");
-};
-
 const play = () => {
-    const audioElemnt = audioWordRef.value;
-    console.log("Play: ", audioElemnt);
-    if (audioElemnt) {
-        /* if (audioElemnt.paused || audioElemnt.ended) {
-          audioElemnt.play();
-          console.log("word: allow to play!");
-          // updatePlayBtnSt(false);
-        } else {
-          audioElemnt.pause();
-          console.log("word: not allow to play!");
-          // updatePlayBtnSt(true);
-        } */
-        audioElemnt.pause();
-        audioElemnt.currentTime = 0;
-        // audioElemnt.src = props.audioURL;
-        audioElemnt.load();
-        audioElemnt.play().catch((error) => {
-            console.error("Error to play: ", error);
-            console.error("url: ", audioURLRef.value);
-            console.error("src: ", audioElemnt.src);
-        });
-    }
+    const childJPlayer = childJPlayerRef.value;
+    childJPlayer?.play();
 };
 
 // Button handler functions
@@ -399,36 +338,6 @@ defineExpose({
     vertical-align: middle;
     /*display: inline-block;
     display: inline;*/
-}
-
-.sound button {
-    /* display:inline-block; */
-    /* display: inline; */
-    /* float:left; */
-    /* overflow:hidden; */
-    /* text-indent:-9999px; */
-    border: none;
-    cursor: pointer;
-}
-
-.jp-play {
-    width: 40px;
-    height: 40px;
-    /* background: url(./assets/images/jplayer.blue.monday.png) no-repeat; */
-    /* 关键修改：./ → /，根路径引用public/assets下的资源 */
-    background: url(/assets/images/jplayer.blue.monday.png) no-repeat;
-}
-
-.jp-play:focus {
-    background: url(/assets/images/jplayer.blue.monday.png) -41px 0 no-repeat;
-}
-
-.jp-state-playing.jp-play {
-    background: url(/assets/images/jplayer.blue.monday.png) 0 -42px no-repeat;
-}
-
-.jp-state-playing.jp-play:focus {
-    background: url(/assets/images/jplayer.blue.monday.png) -41px -42px no-repeat;
 }
 
 .phonetic,
