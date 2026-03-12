@@ -14,7 +14,7 @@
             </ul>
         </div>
 
-        <el-button :disabled="isFinishedRef" type="primary" size="large" @click="start2Recite" class="start-btn">
+        <el-button :disabled="disaStrt2ReciteRef" type="primary" size="large" @click="start2Recite" class="start-btn">
             {{ strtBtnTextRef }}
         </el-button>
 
@@ -45,7 +45,7 @@ const levelListRef = ref<ILevel[]>([]);
 const userLevelMapRef = ref<TUserLevelMap>({});
 
 const reciteDlgVisibleRef = ref(false)
-const isFinishedRef = ref(false)
+const disaStrt2ReciteRef = ref(false)
 const strtBtnTextRef = ref('Start to Recite(␣)')
 
 const configStore = useConfigStore();
@@ -108,14 +108,15 @@ const handleStatsUpdate = (payload: { recited: number; needLearn: number }) => {
 
 const handleReciteFinish = () => {
     reciteDlgVisibleRef.value = false
-    isFinishedRef.value = true
+    disaStrt2ReciteRef.value = true
     strtBtnTextRef.value = "You have finished the today's target. Press Esc to quit!"
 }
 
 const handleKeyDown = async (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
-        if (!isFinishedRef.value) {
-            start2Recite()
+        if (!disaStrt2ReciteRef.value) {
+            disaStrt2ReciteRef.value = true;
+            start2Recite();
         }
     } else if (e.key == 'Esc') {
         ElMessage.info('正在退出学习模式...');
