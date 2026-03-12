@@ -105,7 +105,7 @@ export const useReciteStore = defineStore("reciteState", () => {
 
     function buildURL(url: string){
         const baseURL = rootState.rootState.baseURL;
-        console.debug(`baseURL = ${baseURL}`);
+        // console.debug(`baseURL = ${baseURL}`);
         return `${baseURL}/${url}`;
     }
 

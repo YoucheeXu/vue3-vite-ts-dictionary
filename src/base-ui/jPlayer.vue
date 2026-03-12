@@ -30,7 +30,7 @@ const handleEnded = () => {
 
 const play = () => {
     const audioElemnt = audioWordRef.value;
-    console.debug("Play: ", audioElemnt);
+    // console.debug("Play: ", audioElemnt);
     if (audioElemnt) {
         /* if (audioElemnt.paused || audioElemnt.ended) {
           audioElemnt.play();

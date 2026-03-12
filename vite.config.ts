@@ -53,9 +53,9 @@ export default defineConfig({
                 changeOrigin: true, // Enable cross-origin proxy (critical for CORS)
                 rewrite: (path) => {
                     // Step 1: Log path before/after rewrite (frontend request path)
-                    console.log("Path before proxy rewrite: ", path); // Logs example: /api/dicts/-1/able in frontend terminal
+                    // console.log("Path before proxy rewrite: ", path); // Logs example: /api/dicts/-1/able in frontend terminal
                     const newPath = path.replace(/^\/api/, ""); // Remove "/api" prefix to match backend API structure
-                    console.log("Path after proxy rewrite: ", newPath); // Logs example: /dicts/-1/able
+                    // console.log("Path after proxy rewrite: ", newPath); // Logs example: /dicts/-1/able
                     return newPath;
                 },
                 // Step 2: Configure proxy events to log full forwarded URL
@@ -68,16 +68,16 @@ export default defineConfig({
                         const fullForwardUrl = `${target}${path}`;
 
                         // Log core info: Frontend request URL → Proxy forwarded URL
-                        console.log(
-                            "\n==================== Proxy Forward Log ====================",
-                        );
-                        console.log(
-                            `Frontend Request URL: http://localhost:5173${req.url}`,
-                        );
-                        console.log(`Proxy Forwarded URL: ${fullForwardUrl}`);
-                        console.log(
-                            "=====================================================\n",
-                        );
+                        // console.log(
+                        //     "\n==================== Proxy Forward Log ====================",
+                        // );
+                        // console.log(
+                        //     `Frontend Request URL: http://localhost:5173${req.url}`,
+                        // );
+                        // console.log(`Proxy Forwarded URL: ${fullForwardUrl}`);
+                        // console.log(
+                        //     "=====================================================\n",
+                        // );
                     });
 
                     // Optional: Listen to proxy response event to log backend status code
@@ -86,9 +86,9 @@ export default defineConfig({
                         if (req.url?.includes(".mp3")) {
                             proxyRes.headers["Content-Type"] = "audio/mpeg";
                         }
-                        console.log(
-                            `[Proxy Response] Backend Status Code: ${proxyRes.statusCode}`,
-                        );
+                        // console.log(
+                        //     `[Proxy Response] Backend Status Code: ${proxyRes.statusCode}`,
+                        // );
                     });
                 },
             },
