@@ -374,7 +374,7 @@ defineExpose({
 }
 
 .footer {
-    margin-top: 8px;
+    margin-top: 16px;
     background: #f3f4f6;
     padding: 4px 12px;
     border-top: 1px solid #e5e7eb;
