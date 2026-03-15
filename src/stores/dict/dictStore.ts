@@ -5,7 +5,7 @@ import {
     requestQueryWordLike,
     requestUploadFile,
     requestAddLevel,
-} from "@/service/dict";
+} from "@/services/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";

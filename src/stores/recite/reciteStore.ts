@@ -14,7 +14,7 @@ import {
     requestForget,
     requestChop,
     requestSaveProgress,
-} from "@/service/recite";
+} from "@/services/recite";
 import type { IReciteState, ActEnum } from "./types";
 import type { ICountDetail} from "./types";
 import type { IRetGoStudyMode, IRetStudyNext} from "./types";
