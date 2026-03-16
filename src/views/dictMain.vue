@@ -19,6 +19,7 @@ import { ElMessage } from 'element-plus';
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 import { useDictStore } from "@/stores/dict/dictStore";
+import { TimerId, useMessageQueueStore } from '@/stores/dict/messageQueueStore';
 import { UserMessage, SocketService, createSocketService } from '@/services/socketService';
 
 import titlebar from "@/components/dictTitlebar.vue";
@@ -33,6 +34,8 @@ const configStore = useConfigStore();
 const rootStore = useRootStore();
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
+const messageQueueStore = useMessageQueueStore();
+const { messageQueue } = messageQueueStore;
 
 const userId: Ref<string> = ref(''); // Reactive user ID
 
@@ -70,6 +73,10 @@ const childDictRef = ref(null);
 const dictURLRef = ref("");
 
 const statusInfo = ref("");
+
+// Local state for popped messages
+const latestPopped = ref<string>('')
+let popTimer: TimerId | null = null
 
 const pronounce = () => {
   const childWord = childWordRef.value;
@@ -151,14 +158,48 @@ const handleSwitchTab = (payload: { dictId: number }) => {
 
 const handleStatsUpdate = (payload: { msg: string }) => {
   console.debug(`status: ${payload.msg}`);
-  statusInfo.value = payload.msg;
+  messageQueueStore.push(payload.msg);
+}
+
+const pop = () => {
+  // Clear existing timer to avoid duplicates
+  if (popTimer) clearInterval(popTimer);
+
+  // Only start timer if queue is not empty
+  if (messageQueue.length > 0) {
+    popTimer = setInterval(() => {
+      // Pop ONLY from the queue
+      const poppedStr = messageQueue.shift(); // shift() for FIFO, pop() for LIFO
+      if (poppedStr) {
+        latestPopped.value = poppedStr
+        console.debug('Popped:', poppedStr);
+        statusInfo.value = poppedStr;
+      }
+
+      // Stop timer if queue is empty
+      if (messageQueue.length === 0 && popTimer) {
+        clearInterval(popTimer)
+        popTimer = null
+      }
+    }, 800) // 800ms interval
+  }
 }
 
 // Handler for received active messages
 const handlePrivateMessage = (event: CustomEvent) => {
   const usrMsg = event.detail as UserMessage;
-  handleStatsUpdate({ msg: usrMsg.msg });
+  messageQueueStore.push(usrMsg.msg);
 };
+
+// Watch queue length to auto-start/stop pop timer
+watch(
+  () => messageQueue.length,
+  (newLength) => {
+    if (newLength > 0) pop()
+    else if (popTimer) clearInterval(popTimer)
+  },
+  { immediate: true } // Run on component mount
+)
 
 onMounted(async () => {
   // window.electron.ipcRenderer.invoke('app', 'log', "info", "App Vue");
@@ -196,6 +237,8 @@ onUnmounted((): void => {
   // Clean up SocketService to prevent memory leaks
   socketService.destroy();
   window.removeEventListener('private-message-received', handlePrivateMessage as EventListener);
+
+  if (popTimer) clearInterval(popTimer);
 });
 
 </script>
