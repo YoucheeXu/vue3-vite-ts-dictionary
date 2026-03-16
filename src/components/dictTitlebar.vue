@@ -14,6 +14,8 @@
         <el-dropdown-menu>
           <!-- Custom menu items (adjust as needed) -->
           <el-dropdown-item command="switch2Recite">Recite Words</el-dropdown-item>
+          <el-dropdown-item divided></el-dropdown-item>
+          <el-dropdown-item command="about">About</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -125,7 +127,16 @@ const handleDropdownCommand = (command: string) => {
           console.error('Failed to navigate to /recite:', err)
         }
       })
-      break
+      break;
+    case 'about':
+      // Navigate to /about route
+      router.push('/about').catch(err => {
+        // Catch navigation errors (e.g., duplicate navigation)
+        if (err.name !== 'NavigationDuplicated') {
+          console.error('Failed to navigate to /about:', err)
+        }
+      })
+      break;
   }
 }
 
