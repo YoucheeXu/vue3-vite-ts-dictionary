@@ -7,6 +7,7 @@ import { useConfigStore } from "@/stores/configStore";
 
 export interface IRootState {
   baseURL: string;
+  serverUrl: string;
   timeout: number;
   isPyWebviewReady: boolean;
 }
@@ -17,6 +18,7 @@ export const useRootStore = defineStore("rootState", () => {
     const rootState: IRootState = {
         // baseURL: "http://127.0.0.1:5000",
         baseURL: process.env.NODE_ENV === 'development'? configStore.config.Server.apiPrefix: configStore.config.Server.serverUrl,
+        serverUrl: configStore.config.Server.serverUrl,
         timeout: configStore.config.Server.timeout,
         isPyWebviewReady: false
     };

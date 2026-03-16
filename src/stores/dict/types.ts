@@ -5,6 +5,7 @@ export interface ITabInfo {
 }
 
 export interface IDictState {
+  user: string;
   tabsInfo: ITabInfo[];
   curTabId: number;
   curDictId: number;

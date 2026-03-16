@@ -11,15 +11,17 @@ import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 
 export const useDictStore = defineStore("dictState", () => {
+
+  const configStore = useConfigStore();
+  const rootState = useRootStore();
+
   const dictState: IDictState = {
+    user: configStore.config.Dictionary.User,
     tabsInfo: [],
     curTabId: -1,
     curDictId: -1,
     curWord: "",
   };
-
-  const configStore = useConfigStore();
-  const rootState = useRootStore();
 
   async function getDictsInfo(): Promise<IDictInfo[]> {
     // const dictsInfo = (await window.ipc.invoke("app", "getTabsInfo")) as IDictInfo[];
