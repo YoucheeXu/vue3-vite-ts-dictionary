@@ -146,10 +146,10 @@ export class SocketService {
         this.isConnected.value = true;
         this.authError.value = "";
         this.roomError.value = "";
-        // Auto-authenticate if user ID is set
-        if (this.userId.value.trim()) {
-            this.authenticateUser(this.userId);
-        }
+        // // Auto-authenticate if user ID is set
+        // if (this.userId.value.trim()) {
+        //     this.authenticateUser(this.userId);
+        // }
     }
 
     private handleDisconnect(reason: string): void {
