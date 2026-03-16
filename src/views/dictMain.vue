@@ -1,8 +1,8 @@
 <template>
   <div class="app-wrapper">
     <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" />
-    <inputPanel ref="childInputRef" :words_dict="wordsDict" @query-word="handleQueryWord" @query-word-like="handleQueryWordLike" @query-next="handleQueryNext"
-      @query-prev="handleQueryPrev" />
+    <inputPanel ref="childInputRef" :words_dict="wordsDict" @query-word="handleQueryWord"
+      @query-word-like="handleQueryWordLike" @query-next="handleQueryNext" @query-prev="handleQueryPrev" />
     <wordPanel ref="childWordRef" :word="wordRef" :audio-u-r-l="audioURLRef" :b-new="bNewRef" :level="levelRef"
       :n-stars="nStarsRef" />
     <dictPanel ref="childDictRef" :dict-u-r-l="dictURLRef" @switch-tab="handleSwitchTab"
@@ -19,6 +19,7 @@ import { ElMessage } from 'element-plus';
 import { useConfigStore } from "@/stores/configStore";
 import { useRootStore } from "@/stores/rootStore";
 import { useDictStore } from "@/stores/dict/dictStore";
+import { UserMessage, SocketService, createSocketService } from '@/services/socketService';
 
 import titlebar from "@/components/dictTitlebar.vue";
 import inputPanel from "@/components/dictInputPanel.vue";
@@ -32,6 +33,11 @@ const configStore = useConfigStore();
 const rootStore = useRootStore();
 const dictStore = useDictStore();
 const dictState = dictStore.dictState;
+
+const userId: Ref<string> = ref(''); // Reactive user ID
+
+// Initialize SocketService
+const socketService: SocketService = createSocketService();
 
 const wordsDict = ref<Record<string, string>>({});
 
@@ -148,6 +154,12 @@ const handleStatsUpdate = (payload: { msg: string }) => {
   statusInfo.value = payload.msg;
 }
 
+// Handler for received active messages
+const handlePrivateMessage = (event: CustomEvent) => {
+  const usrMsg = event.detail as UserMessage;
+  handleStatsUpdate({ msg: usrMsg.msg });
+};
+
 onMounted(async () => {
   // window.electron.ipcRenderer.invoke('app', 'log', "info", "App Vue");
 
@@ -167,7 +179,24 @@ onMounted(async () => {
     dictState.tabsInfo = tabs;
     console.log(`Startup: ${JSON.stringify(dictState.tabsInfo)}`);
   });
+
+  socketService.initSocket(rootStore.rootState.serverUrl);
+
+  userId.value = dictState.user;
+  // Auto-authenticate on mount (optional)
+  if (userId.value.trim()) {
+    socketService.authenticateUser(userId);
+  }
+
+  // Listen for custom event from socket service
+  window.addEventListener('private-message-received', handlePrivateMessage as EventListener);
 })
+
+onUnmounted((): void => {
+  // Clean up SocketService to prevent memory leaks
+  socketService.destroy();
+  window.removeEventListener('private-message-received', handlePrivateMessage as EventListener);
+});
 
 </script>
 
