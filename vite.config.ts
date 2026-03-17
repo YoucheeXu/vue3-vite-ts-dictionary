@@ -11,6 +11,25 @@ import { getValidatedAppConfig } from "./src/config/nodeConfigUtils";
 const appConfig = getValidatedAppConfig();
 const serverConfig = appConfig.Server;
 
+/**
+ * Format date to "YYYY-MM-DD HH:mm:ss" (24-hour, local time)
+ * @param date - Date object (default: current build time)
+ * @returns Formatted string (e.g., "2026-03-07 10:45:30")
+ */
+const formatBuildTime = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
+// Generate formatted build time (runs once at build/dev start)
+const BUILD_TIME = formatBuildTime();
+
 export default defineConfig({
     base: "./", // Relative public path to adapt to HTTP server loading
     plugins: [
@@ -107,5 +126,9 @@ export default defineConfig({
             // "@": path.resolve(__dirname, "./src"),
             "@": fileURLToPath(new URL("./src", import.meta.url)),
         },
+    },
+    // Inject build time as a global variable (available in all components)
+    define: {
+        __BUILD_TIME__: JSON.stringify(BUILD_TIME),
     },
 });

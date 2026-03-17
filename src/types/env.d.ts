@@ -24,3 +24,5 @@ declare interface Window {
     };
     handlePythonCommand: (command: string, params: Record<string, any>) => void;
 }
+
+declare const __BUILD_TIME__: string;
