@@ -1,12 +1,7 @@
 <template>
   <div class="app-wrapper">
     <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" />
-    <inputPanel ref="childInputRef" :words_dict="wordsDict" @query-word="handleQueryWord"
-      @query-word-like="handleQueryWordLike" @query-next="handleQueryNext" @query-prev="handleQueryPrev" />
-    <wordPanel ref="childWordRef" :word="wordRef" :audio-u-r-l="audioURLRef" :b-new="bNewRef" :level="levelRef"
-      :n-stars="nStarsRef" />
-    <dictPanel ref="childDictRef" :dict-u-r-l="dictURLRef" @switch-tab="handleSwitchTab"
-      @stats-update="handleStatsUpdate" />
+    <RouterView />
     <bottomPanel :status-info="statusInfo" @top="handleTop" />
   </div>
 </template>
@@ -23,12 +18,7 @@ import { TimerId, useMessageQueueStore } from '@/stores/dict/messageQueueStore';
 import { UserMessage, SocketService, createSocketService } from '@/services/socketService';
 
 import titlebar from "@/components/dictTitlebar.vue";
-import inputPanel from "@/components/dictInputPanel.vue";
-import wordPanel from "@/components/dictWordPanel.vue";
-import dictPanel from "@/components/dictDictPanel.vue";
 import bottomPanel from "@/components/dictBottomPanel.vue";
-
-import type { ITabInfo } from "@/stores/dict/types";
 
 const configStore = useConfigStore();
 const rootStore = useRootStore();
@@ -41,8 +31,6 @@ const userId: Ref<string> = ref(''); // Reactive user ID
 
 // Initialize SocketService
 const socketService: SocketService = createSocketService();
-
-const wordsDict = ref<Record<string, string>>({});
 
 const handleMoveWindow = (payload: { deltaX: number, deltaY: number }) => {
   rootStore.moveWindow(payload.deltaX, payload.deltaY);
@@ -60,106 +48,11 @@ const handleQuit = () => {
   rootStore.quit();
 };
 
-const childInputRef = ref<InstanceType<typeof inputPanel> | null>(null);
-
-const childWordRef = ref<InstanceType<typeof wordPanel> | null>(null);
-const wordRef = ref("");
-const audioURLRef = ref("");
-const bNewRef = ref(false);
-const levelRef = ref("");
-const nStarsRef = ref(0);
-
-const childDictRef = ref(null);
-const dictURLRef = ref("");
-
 const statusInfo = ref("");
 
 // Local state for popped messages
 const latestPopped = ref<string>('')
 let popTimer: TimerId | null = null
-
-const pronounce = () => {
-  const childWord = childWordRef.value;
-  childWord?.play();
-};
-
-const queryWord = async (word: string) => {
-  const dictId = dictState.curDictId;
-  console.log(`query ${word} in #${dictId} dict`);
-  // console.log(`current word: ${dictState.curWord}, tab: ${dictState.curDictId}`);
-
-  // if (word == dictState.curWord && dictId == dictState.curDictId) {
-  //   pronounce();
-  //   return;
-  // }
-  // console.log(`word: ${word}, tabId: ${dictId}`);
-  dictStore
-    .queryWord(word, dictId)
-    .then(([dictURL, audioURL, bNew, level, nStars]: [string, string, boolean, string, number]) => {
-      wordRef.value = word;
-
-      audioURLRef.value = audioURL;
-      // audioURLRef.value = new URL(audioURL).href;
-      console.debug(`Audio src = ${audioURLRef.value}`);
-      bNewRef.value = bNew;
-      levelRef.value = level;
-      nStarsRef.value = nStars;
-
-      dictURLRef.value = dictURL;
-      // dictURLRef.value = new URL(dictURL).href;
-      console.debug(`iframe src = ${dictURLRef.value}`);
-
-      pronounce();
-    });
-  dictState.curWord = word;
-  // dictState.curDictId = dictId;
-};
-
-// TODO: status of QueryPrev button
-const handleQueryWord = async () => {
-  if (childInputRef.value) {
-    const childInput = childInputRef.value;
-    const word = childInput.word;
-    // const tabId = childDictRef.value.editableTabsValue;
-    queryWord(word);
-  }
-};
-
-const handleQueryWordLike = async (playload: { dictId: number, wordLike: string, limit: number }) => {
-  wordsDict.value = await dictStore.query_wordlike(playload.dictId, playload.wordLike, playload.limit);
-  // console.debug(`wordsDict = ${wordsDict.value}`);
-}
-
-// TODO: status of button
-const handleQueryNext = async () => {
-  dictStore.getNextWordAct().then((word: string) => {
-    queryWord(word);
-  });
-};
-
-// TODO: status of button
-const handleQueryPrev = async () => {
-  dictStore.getPrevWordAct().then((word: string) => {
-    queryWord(word);
-  });
-};
-
-const handleSwitchTab = (payload: { dictId: number }) => {
-  const dictId = payload.dictId;
-  console.debug(`switch to tab ${dictId}`);
-  if (childInputRef.value) {
-    dictState.curDictId = dictId;
-    const word = childInputRef.value.word as string;
-    if (word.length > 1) {
-      queryWord(word);
-    }
-  }
-};
-
-const handleStatsUpdate = (payload: { msg: string }) => {
-  console.debug(`status: ${payload.msg}`);
-  messageQueueStore.push(payload.msg);
-}
 
 const pop = () => {
   // Clear existing timer to avoid duplicates
@@ -215,11 +108,6 @@ onMounted(async () => {
     console.debug(`height = ${height}`);
     rootStore.resize(width, height);
   }
-
-  dictStore.getTabsInfo().then((tabs: ITabInfo[]) => {
-    dictState.tabsInfo = tabs;
-    console.log(`Startup: ${JSON.stringify(dictState.tabsInfo)}`);
-  });
 
   socketService.initSocket(rootStore.rootState.serverUrl);
 

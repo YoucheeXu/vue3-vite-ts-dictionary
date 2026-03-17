@@ -1,6 +1,5 @@
 import {
     createRouter,
-    createWebHistory,
     createWebHashHistory,
 } from "vue-router";
 
@@ -11,12 +10,32 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            redirect: "/dict",
+            redirect: "/dict/dict",
         },
         {
             path: "/dict",
             name: "dict",
             component: () => import("@/views/dictMain.vue"),
+            // Nested sub-routes (share the layout's title/status bar)
+            children: [
+                {
+                    path: "", // Empty path = default child route
+                    name: "dictDefault",
+                    component: () => import("@/views/dictDict.vue"),
+                },
+                // Sub-route 1: /dict/dict (original /dict page)
+                {
+                    path: "dict",
+                    name: "dictDict",
+                    component: () => import("@/views/dictDict.vue"),
+                },
+                // Sub-route 2: /dict/about (original /about page, now nested)
+                {
+                    path: "about",
+                    name: "dictAbout",
+                    component: () => import("@/views/dictAbout.vue"),
+                },
+            ],
         },
         {
             path: "/about",

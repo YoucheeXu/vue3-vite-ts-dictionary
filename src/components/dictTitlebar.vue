@@ -1,8 +1,5 @@
 <template>
-  <div class="title_panel titlebar"
-    @mousedown="handleMouseDown" @mouseup="handleMouseUp"
-    @mouseleave="handleMouseUp"
-  >
+  <div class="title_panel titlebar" @mousedown="handleMouseDown" @mouseup="handleMouseUp" @mouseleave="handleMouseUp">
     <el-dropdown id="menu_dropdown" @command="handleDropdownCommand" ref="dropdownRef" trigger="click">
       <!-- <button class="btn" type="button" id="btn_menu" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false"></button> -->
@@ -40,7 +37,7 @@ import imgButton3 from "@/base-ui/imgButton3.vue";
 import { throttle } from '@/utilities/utilities';
 
 const emit = defineEmits<{
-  "moveWindow": [payload: {deltaX : number, deltaY : number}],
+  "moveWindow": [payload: { deltaX: number, deltaY: number }],
   "quit": [];
   "minimize": [];
 }>();
@@ -129,11 +126,11 @@ const handleDropdownCommand = (command: string) => {
       })
       break;
     case 'about':
-      // Navigate to /about route
-      router.push('/about').catch(err => {
+      // Navigate to /dict/about route
+      router.push('/dict/about').catch(err => {
         // Catch navigation errors (e.g., duplicate navigation)
         if (err.name !== 'NavigationDuplicated') {
-          console.error('Failed to navigate to /about:', err)
+          console.error('Failed to navigate to /dict/about:', err)
         }
       })
       break;
