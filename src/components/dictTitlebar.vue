@@ -12,6 +12,7 @@
           <!-- Custom menu items (adjust as needed) -->
           <el-dropdown-item command="switch2Recite">Recite Words</el-dropdown-item>
           <el-dropdown-item divided></el-dropdown-item>
+          <el-dropdown-item command="restart">Restart</el-dropdown-item>
           <el-dropdown-item command="about">About</el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -40,6 +41,7 @@ const emit = defineEmits<{
   "moveWindow": [payload: { deltaX: number, deltaY: number }],
   "quit": [];
   "minimize": [];
+  "restart": [];
 }>();
 
 // Reference to the title bar DOM element
@@ -124,6 +126,9 @@ const handleDropdownCommand = (command: string) => {
           console.error('Failed to navigate to /recite:', err)
         }
       })
+      break;
+    case 'restart':
+      emit("restart");
       break;
     case 'about':
       // Navigate to /dict/about route

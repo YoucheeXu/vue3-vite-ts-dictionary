@@ -86,6 +86,16 @@ export const useRootStore = defineStore("rootState", () => {
         }
     }
 
+    async function restart(): Promise<void> {
+        // window.ipc.invoke("app", "quit");
+        if (rootState.isPyWebviewReady) {
+            const result = window.pywebview.api.invoke("restart");
+            console.debug(result);
+        } else {
+
+        }
+    }
+
     return {
         rootState,
         waitForPyWebview,
@@ -94,6 +104,7 @@ export const useRootStore = defineStore("rootState", () => {
         resize,
         top,
         fullscreen,
-        quit
+        quit,
+        restart
     };
 });

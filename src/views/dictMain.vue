@@ -1,6 +1,6 @@
 <template>
   <div class="app-wrapper">
-    <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" />
+    <titlebar @move-window="handleMoveWindow" @quit="handleQuit" @minimize="handleMinimize" @restart="handleRestart" />
     <RouterView />
     <bottomPanel :status-info="statusInfo" @top="handleTop" />
   </div>
@@ -38,6 +38,10 @@ const handleMoveWindow = (payload: { deltaX: number, deltaY: number }) => {
 
 const handleMinimize = () => {
   rootStore.minimize();
+};
+
+const handleRestart = () => {
+  rootStore.restart();
 };
 
 const handleTop = (payload: { isTop: boolean }) => {
