@@ -242,6 +242,9 @@ const splitLines = (): void => {
 }
 
 async function dealWithFiles(filesList: FileItem[]) {
+  let i: number = 0;
+  let j: number = 0;
+  let k: number = 0;
   for (const file of filesList) {
     const fileName = file.name
     console.debug(`${fileName}: ${file.fullPath}`)
@@ -250,10 +253,12 @@ async function dealWithFiles(filesList: FileItem[]) {
       const msg = ret.msg;
       console.debug(`upload audio: ${msg}`);
       emit('statsUpdate', { msg });
+      i += 1;
     } else if (fileName.endsWith('.json')) {
       const ret = await dictStore.uploadDict(dictState.curDictId, file.file);
       const msg = ret.msg;
       emit('statsUpdate', { msg });
+      j += 1;
     } else if (fileName.endsWith('.txt')) {
       // Read TXT and split lines
       const reader = new FileReader()
@@ -265,6 +270,7 @@ async function dealWithFiles(filesList: FileItem[]) {
         for (const word of txtLines.value) {
           const ret = await dictStore.addLevel(word, level);
           emit('statsUpdate', { msg: ret.msg });
+          k += 1;
         }
       }
       reader.onerror = () => {
@@ -274,6 +280,15 @@ async function dealWithFiles(filesList: FileItem[]) {
     } else {
       throw new Error(`Unsupported file type: ${fileName} (only .json/.mp3/.txt are allowed)`);
     }
+  }
+  if (i > 0) {
+    emit('statsUpdate', { msg: `A total of ${i} mp3 have been added.` });
+  }
+  if (j > 0) {
+    emit('statsUpdate', { msg: `A total of ${j} json have been added.` });
+  }
+  if (k > 0) {
+    emit('statsUpdate', { msg: `A total of ${k} word have been added.` });
   }
 }
 
