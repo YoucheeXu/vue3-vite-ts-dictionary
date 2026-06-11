@@ -3,7 +3,8 @@
 		"serverUrl": "http://127.0.0.1:5000",
 		"apiPrefix": "/api",
 		"timeout": 5000,
-		"enableMock": false
+		"enableMock": false,
+		"app": "dictserver.exe"
 	},
 	"Dictionary":{
 		"GUI": {
