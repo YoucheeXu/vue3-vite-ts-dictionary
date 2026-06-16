@@ -43,6 +43,7 @@ const emit = defineEmits<{
 // const word = defineModel();
 const word = ref("");
 const autoCompleteRef = ref<InstanceType<typeof import('element-plus')['ElAutocomplete']>>();
+let nativeInput: HTMLInputElement | null = null;
 const isLoading = ref(false);
 // Store the latest callback for refreshing suggestions
 const latestSuggestionCallback = ref<((results: any[]) => void) | null>(null);
@@ -53,6 +54,16 @@ const dropdownOptions = computed(() => {
   // Convert Record to array: { key: string, value: string }[]
   return Object.entries(props.words_dict).map(([key, value]) => ({ key, value }));
 });
+
+onMounted(() => {
+  // 获取原生 input DOM
+  const inputInstance = autoCompleteRef.value?.inputRef
+  if (inputInstance) {
+    nativeInput = (inputInstance.input || inputInstance.$el?.querySelector('input')) as HTMLInputElement
+    // 捕获阶段绑定，确保先于组件内部监听器执行
+    nativeInput?.addEventListener('keydown', handleNativeKeyDown, true)
+  }
+})
 
 // Handle input change & emit query to parent
 const handleFetchSuggestions = (query: string, callback: (results: any[]) => void) => {
@@ -77,15 +88,14 @@ const handleFetchSuggestions = (query: string, callback: (results: any[]) => voi
 
 const focusAndSelectInput = async () => {
   await nextTick(); // Wait for DOM to update (after dropdown closes)
-  if (!autoCompleteRef.value || !autoCompleteRef.value.inputRef) return;
-
   // Get the underlying input DOM element
-  const inputElement = autoCompleteRef.value.inputRef;
+  const inputInstance = autoCompleteRef.value?.inputRef
+  if (!inputInstance) return;
 
-  inputElement.focus(); // Regain focus
-  inputElement.select(); // Select all text in input
-
-  // closeDropdown();
+  inputInstance.focus(); // Regain focus
+  // inputInstance.select(); // Select all text in input
+  const nativeInput = inputInstance.input || inputInstance.$el?.querySelector('input')
+  nativeInput?.select();
 };
 
 const closeDropdown = async () => {
@@ -93,11 +103,12 @@ const closeDropdown = async () => {
     latestSuggestionCallback.value([]); // No suggestions = dropdown closes
   }
 
-  if (autoCompleteRef.value) {
-    autoCompleteRef.value.blur();
-  }
-
   isLoading.value = false;
+
+  if (autoCompleteRef.value) {
+    // autoCompleteRef.value.blur();
+    autoCompleteRef.value.close();
+  }
 
   if (autoCompleteRef.value?.popperRef) {
     autoCompleteRef.value.popperRef.hide(); // Official hide method
@@ -129,6 +140,20 @@ const handleEnterKey = () => {
   handleQueryWord();
 };
 
+/**
+ * Handles native Home/End key events to preserve default cursor behavior.
+ * Stops event propagation to prevent the autocomplete component from
+ * intercepting and overriding native cursor navigation.
+ * @param e - Native DOM keyboard event instance
+ */
+const handleNativeKeyDown = (e: KeyboardEvent): void => {
+  if (e.key === 'Home' || e.key === 'End') {
+    // Prevent the event from bubbling up to the component's internal key handler
+    e.stopPropagation()
+    // Browser will execute native cursor jump behavior by default
+  }
+}
+
 const handleBtnCliked = (id: string) => {
   console.debug(id + " was clicked!");
   switch (id) {
@@ -158,6 +183,12 @@ const handleQueryWord = async () => {
 defineExpose({
   word,
 });
+
+onBeforeUnmount(() => {
+  // 解绑事件，避免内存泄漏
+  nativeInput?.removeEventListener('keydown', handleNativeKeyDown, true)
+  nativeInput = null
+})
 
 </script>
 
