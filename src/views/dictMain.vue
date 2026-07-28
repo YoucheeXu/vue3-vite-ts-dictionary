@@ -113,6 +113,8 @@ onMounted(async () => {
     rootStore.resize(width, height);
   }
 
+  await rootStore.modifyTitle("Dictionary");
+
   socketService.initSocket(rootStore.rootState.serverUrl);
 
   userId.value = dictState.user;

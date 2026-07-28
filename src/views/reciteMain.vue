@@ -49,7 +49,7 @@ const disaStrt2ReciteRef = ref(false)
 const strtBtnTextRef = ref('Start to Recite(␣)')
 
 const configStore = useConfigStore();
-const rootState = useRootStore();
+const rootStore = useRootStore();
 const reciteStore = useReciteStore();
 
 const stats = reactive({
@@ -122,19 +122,21 @@ const handleKeyDown = async (e: KeyboardEvent) => {
         ElMessage.info('正在退出学习模式...');
         // setTimeout(() => window.location.reload(), 1000)
         await reciteStore.saveProgress();
-        await rootState.quit();
+        await rootStore.quit();
     }
 }
 
 onMounted(async () => {
     window.addEventListener('keydown', handleKeyDown);
 
-    rootState.rootState.isPyWebviewReady = await rootState.waitForPyWebview();
-    if (!rootState.rootState.isPyWebviewReady) {
+    rootStore.rootState.isPyWebviewReady = await rootStore.waitForPyWebview();
+    if (!rootStore.rootState.isPyWebviewReady) {
         ElMessage.warning('pywebview API unavailable');
     }
 
-    await rootState.fullscreen();
+    await rootStore.fullscreen();
+
+	await rootStore.modifyTitle("Recite");
 
     currentUserRef.value = configStore.config.ReciteWords.LastUser;
     currentLevelRef.value = configStore.config.ReciteWords.LastTarget;

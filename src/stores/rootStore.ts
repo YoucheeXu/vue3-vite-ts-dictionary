@@ -95,6 +95,11 @@ export const useRootStore = defineStore("rootState", () => {
 
         }
     }
+    
+    async function modifyTitle(title: string){
+      const result = window.pywebview.api.invoke("ModifyTitle", (title = title));
+      console.debug(result)
+    }
 
     return {
         rootState,
@@ -105,6 +110,7 @@ export const useRootStore = defineStore("rootState", () => {
         top,
         fullscreen,
         quit,
-        restart
+        restart,
+        modifyTitle
     };
 });
