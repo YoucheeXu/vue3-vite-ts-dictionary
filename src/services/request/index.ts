@@ -68,19 +68,19 @@ class CNetRequest {
             return config;
         }, err => {
             console.log("instance for all interceptor request fail");
-            return err;
+            Promise.reject(err);
         })
         this.instance.interceptors.response.use((res) => {
             return res.data;
         }, (err) => {
-            console.log("instance for all interceptor response fail");
-            console.log(err.response.status);   // error code like 404
+            console.error(`instance for all interceptor response fail: ${err.response.status}`);
             const status = err.response.status;
             const errorMsg = mapErrorStatus.get(status) || `Unkown Error(${status || 'No Error Code'})`;
             console.error(`[HTTP Error]${errorMsg}`);
             // Throw structured error (easy for business layer to catch)
             err.customMessage = errorMsg; // Add custom prompt to error object
-            return err;
+            // return err;
+            return Promise.reject(err);
         })
     }
 
@@ -97,7 +97,7 @@ class CNetRequest {
                 resolve(res);
             }).catch(err => {
                 reject(err);
-                return err;
+                // return err;
             })
             // .finally(() => {})
         })

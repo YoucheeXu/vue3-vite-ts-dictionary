@@ -160,6 +160,7 @@ export class SocketService {
         // Auto-reconnect if disconnected by server
         if (reason === "io server disconnect" && this.socket) {
             this.socket.connect();
+            this.authenticateUser(this.userId);
         }
     }
 

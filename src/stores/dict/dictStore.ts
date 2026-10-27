@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import {
-    requestDictsInfo,
-    requestQueryWord,
-    requestQueryWordLike,
-    requestUploadFile,
-    requestAddLevel,
+  requestDictsInfo,
+  requestQueryWord,
+  requestQueryWordLike,
+  requestUploadFile,
+  requestAddLevel,
 } from "@/services/dict";
 import type { ITabInfo, IDictState, IDictInfo, IDictDetail, IWordDetail } from "./types";
 import { useConfigStore } from "@/stores/configStore";
@@ -49,7 +49,7 @@ export const useDictStore = defineStore("dictState", () => {
         dictId: dictInfo.DictId,
       });
 
-      if (dictInfo.TabId == dictState.curTabId){
+      if (dictInfo.TabId == dictState.curTabId) {
         dictState.curDictId = dictInfo.DictId;
       }
     }
@@ -88,23 +88,23 @@ export const useDictStore = defineStore("dictState", () => {
   }
 
   async function query_wordlike(
-      dictId: number,
-      wordLike: string,
-      limit: number,
+    dictId: number,
+    wordLike: string,
+    limit: number,
   ): Promise<Record<string, string>> {
     const result = await requestQueryWordLike(dictId, wordLike, limit);
     const word_dict = result.data as Record<string, string>;
     return word_dict;
   }
 
-  async function uploadDict(dictId: number, file: File){
+  async function uploadDict(dictId: number, file: File) {
     const uploadUrl = `/dicts/${dictId}/upload/${file.name}`;
     const formData = new FormData();
     formData.append('file', file);
     return requestUploadFile(uploadUrl, formData);
   }
 
-  async function uploadAudio(dictId: number, file: File){
+  async function uploadAudio(dictId: number, file: File) {
     const uploadUrl = `/audios/${dictId}/upload/${file.name}`;
     const formData = new FormData();
     formData.append('file', file);

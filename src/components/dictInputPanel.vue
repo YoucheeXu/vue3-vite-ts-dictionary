@@ -155,7 +155,7 @@ const handleNativeKeyDown = (e: KeyboardEvent): void => {
 }
 
 const handleBtnCliked = (id: string) => {
-  console.debug(id + " was clicked!");
+  // console.debug(id + " was clicked!");
   switch (id) {
     case "btn_del":
       word.value = "";

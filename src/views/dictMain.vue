@@ -55,12 +55,21 @@ const handleQuit = () => {
 const statusInfo = ref("");
 
 // Local state for popped messages
-const latestPopped = ref<string>('')
+// const latestPopped = ref<string>('')
 let popTimer: TimerId | null = null
+let clearTimer: TimerId | null = null
 
 const pop = () => {
   // Clear existing timer to avoid duplicates
-  if (popTimer) clearInterval(popTimer);
+  if (popTimer) {
+    clearInterval(popTimer);
+    popTimer = null;
+  }
+
+  if (clearTimer) {
+    clearTimeout(clearTimer);
+    clearTimer = null;
+  }
 
   // Only start timer if queue is not empty
   if (messageQueue.length > 0) {
@@ -68,7 +77,7 @@ const pop = () => {
       // Pop ONLY from the queue
       const poppedStr = messageQueue.shift(); // shift() for FIFO, pop() for LIFO
       if (poppedStr) {
-        latestPopped.value = poppedStr
+        // latestPopped.value = poppedStr
         console.debug('Popped:', poppedStr);
         statusInfo.value = poppedStr;
       }
@@ -78,6 +87,12 @@ const pop = () => {
         clearInterval(popTimer)
         popTimer = null
       }
+
+      clearTimer = setTimeout(() => {
+        statusInfo.value = '';
+        // latestPopped.value = '';
+        clearTimer = null;
+      }, 3000);
     }, 800) // 800ms interval
   }
 }

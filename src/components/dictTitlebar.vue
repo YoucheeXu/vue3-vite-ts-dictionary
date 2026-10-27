@@ -32,13 +32,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+// import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import imgButton3 from "@/base-ui/imgButton3.vue";
-import { throttle } from '@/utilities/utilities';
+// import { throttle } from '@/utilities/utilities';
 
 const emit = defineEmits<{
-  "moveWindow": [payload: { deltaX: number, deltaY: number }],
+  // "moveWindow": [payload: { deltaX: number, deltaY: number }],
   "quit": [];
   "minimize": [];
   "restart": [];
@@ -46,10 +46,10 @@ const emit = defineEmits<{
 
 const router = useRouter()
 // Ref for dropdown (to manually control show/hide if needed)
-const dropdownRef = ref(null)
+// const dropdownRef = ref(null)
 
 const handleBtnCliked = (id: string) => {
-  console.log(id + " was clicked!");
+  // console.log(id + " was clicked!");
   switch (id) {
     case "btn_close":
       // this.WaitAsyncTasksFnshd(async () => {

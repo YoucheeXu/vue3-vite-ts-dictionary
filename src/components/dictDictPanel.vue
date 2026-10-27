@@ -40,6 +40,8 @@ import type { TabsPaneContext } from "element-plus";
 import type { TabPaneName } from "element-plus";
 import type { ITabInfo } from "@/stores/dict/types";
 
+import { isAxiosError, AxiosError } from 'axios';
+
 const props = defineProps<{ dictURL: string }>();
 
 const dictStore = useDictStore();
@@ -249,16 +251,33 @@ async function dealWithFiles(filesList: FileItem[]) {
     const fileName = file.name
     console.debug(`${fileName}: ${file.fullPath}`)
     if (fileName.endsWith('.mp3')) {
-      const ret = await dictStore.uploadAudio(1, file.file);
-      const msg = ret.msg;
-      console.debug(`upload audio: ${msg}`);
-      emit('statsUpdate', { msg });
-      i += 1;
+      try {
+        const ret = await dictStore.uploadAudio(1, file.file);
+        const msg = ret.msg;
+        console.debug(`upload audio: ${msg}`);
+        emit('statsUpdate', { msg });
+        i += 1;
+      } catch (err) {
+        // const msg = err.response?.data?.msg;
+        const msg = isAxiosError(err)
+          ? (err.response?.data?.msg ?? err.message)
+          : err instanceof Error
+            ? err.message
+            : '上传失败';
+        emit('statsUpdate', { msg });
+      }
+
     } else if (fileName.endsWith('.json')) {
-      const ret = await dictStore.uploadDict(dictState.curDictId, file.file);
-      const msg = ret.msg;
-      emit('statsUpdate', { msg });
-      j += 1;
+      try {
+        const ret = await dictStore.uploadDict(dictState.curDictId, file.file);
+        const msg = ret.msg;
+        emit('statsUpdate', { msg });
+        j += 1;
+      } catch (err) {
+        const e = err as AxiosError<{ msg?: string }>;
+        const msg = e.response?.data?.msg ?? e.message ?? '上传失败';
+        emit('statsUpdate', { msg });
+      }
     } else if (fileName.endsWith('.txt')) {
       // Read TXT and split lines
       const reader = new FileReader()

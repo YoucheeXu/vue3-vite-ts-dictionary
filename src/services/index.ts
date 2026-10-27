@@ -20,16 +20,18 @@ const netRequest = new CNetRequest({
             return config;
         },
         requestInterceptorCatch: (err) => {
-            console.log("requset fail intercetpor");
-            return err;
+            console.error("requset fail intercetpor");
+            return Promise.reject(err);
         },
         responseInterceptor: (config) => {
-            console.log("请求配置：", config);
+            console.error("请求配置：", config);
             return config;
         },
         responseInterceptorCatch: (err) => {
-            console.log("response fail intercetpor: " + err.code);
-            return err;
+            console.error("response fail intercetpor: " + err.code);
+            console.error("response fail intercetpor: " + err.response?.data?.msg);
+            // return err;
+            return Promise.reject(err);
         },
     },
 });
